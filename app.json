@@ -28,6 +28,11 @@
     },
     "web": {
       "favicon": "./src/assets/images/favicon.png"
-    }
+    }, 
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ]
   }
 }
