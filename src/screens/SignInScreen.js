@@ -4,34 +4,44 @@ import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
 import axios from "axios";
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+import getEnvVars from '../environment';
 
 const SignInScreen = () => {
+	const ENV = getEnvVars();
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
+
 	const navigation = useNavigation(); 
 	
 	const onSignInPressed = () => {
 		axios({
 			method: 'post', 
-			url: 'http://localhost:8080/members/login', 
+			url: ENV.apiDomain + '/api/members/login', 
 			data: JSON.stringify({
-				'id': 'rhaldud89@gmail.com',
-				'password': 'test'
+				'username': username,
+				'password': password
 			}), 
 			headers: {
 				"Content-Type" : "application/json; charset=utf-8"
 			},
-			timeout: 5000
+			// timeout: 5000
 		})
 		.then(function(response) {
-			console.log("");
-			console.log("RESPONSE : " + JSON.stringify(response.data));
-			console.log("");
+			alert('error')
+			console.error(response)
+			if (response.data.code == 0){
+				data = response.data
+				AsyncStorage.setItem('userData',JSON.stringify({'username': username, 'token': data.token}), () => {
+					console.warn('유저정보 저장 완료')
+				  });  
+				console.warn(AsyncStorage.getItem('userData'))		
+			} else {
+				
+			}
 		})
 		.catch(function(error) {
-			console.log("");
-			console.log("ERROR : " + JSON.stringify(error));
-			console.log("");
+			alert('error')
 		});
 		
 	};
@@ -75,7 +85,7 @@ const SignInScreen = () => {
 			<Pressable onPress={onSocialLoginPressed}>
 				<Image 
 					style={styles.image} 
-					source={require('../assets/images/kakao_login_medium_wide.png')}
+					source={require('./../assets/images/kakao_login_medium_wide.png')}
 				/>
 			</Pressable>
 

@@ -5,6 +5,7 @@ import AuthStack from './navigations/AuthStack';
 
 
 export default function App() {
+
   return (
     <NavigationContainer theme ={{colors:{background: 'skyblue'}}}>
       <AuthStack />
