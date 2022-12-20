@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
 	container: {
         marginTop: '9%',
         marginLeft: '9%',
-		marginRight: '9%'
+		    marginRight: '9%'
     }
  })
 

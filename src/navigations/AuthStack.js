@@ -29,7 +29,7 @@ const AppTabComponent = () => {
     return (
       <MainScreenTab.Navigator>
         <MainScreenTab.Screen name="HikingStack" component={HikingComponent} />
-        <MainScreenTab.Screen name="기록보기" component={DiaryScreen} />
+        <MainScreenTab.Screen name="Diary" component={DiaryScreen} />
       </MainScreenTab.Navigator>
     );
   };

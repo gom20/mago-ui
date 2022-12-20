@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, Image, StyleSheet } from 'react-native';
+import { View, Text, Pressable, Image, StyleSheet, Alert } from 'react-native';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
 import axios from "axios";
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import getEnvVars from '../environment';
 
 const SignInScreen = () => {
@@ -15,13 +15,13 @@ const SignInScreen = () => {
 	const navigation = useNavigation(); 
 	
 	const onSignInPressed = () => {
-		navigation.navigate('AppTabComponent');
+		// navigation.navigate('AppTabComponent');
 		axios({
 			method: 'post', 
 			url: ENV.apiDomain + '/api/members/login', 
 			data: JSON.stringify({
-				'username': username,
-				'password': password
+				'username': 'rhaldud89@gmail.com',
+				'password': 'test'
 			}), 
 			headers: {
 				"Content-Type" : "application/json; charset=utf-8"
@@ -29,13 +29,13 @@ const SignInScreen = () => {
 			// timeout: 5000
 		})
 		.then(function(response) {
-			if (response.data.code == 0){
-				data = response.data
-				// AsyncStorage.setItem('userData',JSON.stringify({'username': username, 'token': data.token}), () => {
-				// 	console.warn('유저정보 저장 완료')
-				//   });  
-				// navigation.navigate('AppTabComponent');
-				
+			// console.error('...')
+			if (response.data.code == 0){ 
+				// data = response.data;
+				// console.error(response.data.data.token)
+				AsyncStorage.setItem('userData', JSON.stringify({'username': 'rhaldud89@gmail.com', 'token': response.data.data.token}), () => {
+					navigation.navigate('AppTabComponent');
+				})
 			} else {
 				
 			}
@@ -43,7 +43,6 @@ const SignInScreen = () => {
 		.catch(function(error) {
 
 		});
-		
 	};
 
 	const onSignUpPressed = async (data) => {
