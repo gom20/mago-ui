@@ -15,6 +15,7 @@ const SignInScreen = () => {
 	const navigation = useNavigation(); 
 	
 	const onSignInPressed = () => {
+		navigation.navigate('AppTabComponent');
 		axios({
 			method: 'post', 
 			url: ENV.apiDomain + '/api/members/login', 
@@ -28,20 +29,19 @@ const SignInScreen = () => {
 			// timeout: 5000
 		})
 		.then(function(response) {
-			alert('error')
-			console.error(response)
 			if (response.data.code == 0){
 				data = response.data
-				AsyncStorage.setItem('userData',JSON.stringify({'username': username, 'token': data.token}), () => {
-					console.warn('유저정보 저장 완료')
-				  });  
-				console.warn(AsyncStorage.getItem('userData'))		
+				// AsyncStorage.setItem('userData',JSON.stringify({'username': username, 'token': data.token}), () => {
+				// 	console.warn('유저정보 저장 완료')
+				//   });  
+				// navigation.navigate('AppTabComponent');
+				
 			} else {
 				
 			}
 		})
 		.catch(function(error) {
-			alert('error')
+
 		});
 		
 	};
