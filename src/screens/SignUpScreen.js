@@ -1,139 +1,150 @@
-import React, { useState } from 'react';
-import { View, Text, Pressable, Image, StyleSheet, Modal } from 'react-native';
-import CustomInput from '../components/CustomInput';
-import CustomButton from '../components/CustomButton';
-import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import CustomButton from '../components/CustomButton';
+import CustomInput from '../components/CustomInput';
 import getEnvVars from '../environment';
 
 const SignUpScreen = () => {
     const ENV = getEnvVars();
-	const [username, setUsername] = useState('');
-	const [password, setPassword] = useState('');
-	const [confirmPassword, setConfirmPassword] = useState('');
-
-	const [usernameError, setUsernameError] = useState(false);
+    const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [emailError, setEmailError] = useState(false);
+    const [nameError, setNameError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
     const [confirmPasswordError, setConfirmPasswordError] = useState(false);
 
-    const navigation = useNavigation(); 
+    const navigation = useNavigation();
 
-    const onChangeUsername = () => {
-        const emailRegex = /^(([^<>()\[\].,;:\s@"]+(\.[^<>()\[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
-        if (!username || emailRegex.test(username)) setUsernameError(false);
-        else setUsernameError(true);
+    const validateInputs = () => {
+        let validFlag = true;
+
+        const emailRegex =
+            /^(([^<>()\[\].,;:\s@"]+(\.[^<>()\[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
+        if (email && emailRegex.test(email)) {
+            setEmailError(false);
+        } else {
+            setEmailError(true);
+            validFlag = false;
+        }
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/;
+        if (password && passwordRegex.test(password)) {
+            setPasswordError(false);
+        } else {
+            setPasswordError(true);
+            validFlag = false;
+        }
+        if (name) {
+            setNameError(false);
+        } else {
+            setNameError(true);
+            validFlag = false;
+        }
+        if (confirmPassword && password === confirmPassword) {
+            setConfirmPasswordError(false);
+        } else {
+            setConfirmPasswordError(true);
+            validFlag = false;
+        }
+
+        return validFlag;
     };
-    const onChangePassword = () => {
-        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-        if ((!password || (passwordRegex.test(password)))) setPasswordError(false);
-        else setPasswordError(true);
 
-        if (!confirmPassword || password === confirmPassword) setConfirmPasswordError(false);
-        else setConfirmPasswordError(true);
-    };
-    const onChangeConfirmPassword = () => {
-        if (password === confirmPassword) setConfirmPasswordError(false);
-        else setConfirmPasswordError(true);
-    };
+    const onSignUpPressed = () => {
+        if (!validateInputs()) return;
 
-	const validation = () => {
-        if(!username) setUsernameError(true);
-        if(!password) setPasswordError(true);
-        if(!confirmPassword) setConfirmPasswordError(true);
-
-        if(username && password && confirmPassword) return true;
-        else return false;
-    }
-
-	const onSignUpPressed = () => {
-        // if(!validation()) {
-        //     alert('ui error')
-        //     return;
-        // }
         axios({
-			method: 'post', 
-			url: ENV.apiDomain + '/api/members', 
-			data: JSON.stringify({
-				'username': username,
-				'password': password
-			}), 
-			headers: {
-				"Content-Type" : "application/json; charset=utf-8"
-			},
-        }).then(function(response) {
-            console.error(response)
-            if(response.data.code == 0) {
-                navigation.navigate('SignIn');
-            } else {
-                alert('server error')
-            }
-        }).catch(function (error) {
-            alert('undefined error')
-        });
-    }
+            method: 'post',
+            url: ENV.apiDomain + '/api/members',
+            data: JSON.stringify({
+                email: email,
+                name: name,
+                password: password,
+            }),
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+        })
+            .then(function (response) {
+                console.error(response);
+                if (response.data.code == 0) {
+                    navigation.navigate('SignIn');
+                } else {
+                    alert('server error');
+                }
+            })
+            .catch(function (error) {
+                alert('internal error');
+            });
+    };
 
-	return (
-		<View style={styles.container}>
-			<Text style={styles.text}>회원가입</Text>
-			<Text style={styles.label}>이메일 주소</Text>
-			<CustomInput
-				value={username}
-				setValue={setUsername}
-                onChange={onChangeUsername}
-				placeholder="이메일 주소" 
-			/>
-            {usernameError && <Text style={styles.invalid}> 사용자 계정은 고유한 이메일 주소를 사용해야 합니다. </Text>} 
-			<Text style={styles.label}>비밀번호</Text>
-			<CustomInput
-				value={password}
-				setValue={setPassword}
-                onChange={onChangePassword}
-				placeholder="8자 이상, 특수문자 포함"
+    return (
+        <View style={styles.container}>
+            <Text style={styles.text}>회원가입</Text>
+            <CustomInput
+                label="이메일"
+                value={email}
+                setValue={setEmail}
+                placeholder="이메일"
+                invalidFlag={emailError}
+                invalidText="이메일을 입력해 주세요."
+            />
+            <CustomInput
+                label="이름"
+                value={name}
+                setValue={setName}
+                placeholder="이름"
+                invalidFlag={nameError}
+                invalidText="이름을 입력해 주세요."
+            />
+            <CustomInput
+                label="비밀번호"
+                value={password}
+                setValue={setPassword}
+                placeholder="영문자, 숫자 포함 최소 8~20자"
                 secureTextEntry={true}
-			/>
-            {passwordError && <Text style={styles.invalid}> 비밀번호는 8자 이상, 숫자가 포함되어야 합니다. </Text>} 
-			<Text style={styles.label}>비밀번호 확인</Text>
-			<CustomInput
-				value={confirmPassword}
-				setValue={setConfirmPassword}
-                onChange={onChangeConfirmPassword}
-				placeholder="8자 이상, 특수문자 포함"
+                invalidFlag={passwordError}
+                invalidText="영문자, 숫자 조합으로 8자 이상 입력해주세요."
+            />
+            <CustomInput
+                label="비밀번호 확인"
+                value={confirmPassword}
+                setValue={setConfirmPassword}
+                placeholder="비밀번호 확인"
                 secureTextEntry={true}
-			/>
-            {confirmPasswordError && <Text style={styles.invalid}> 비밀번호가 동일하지 않습니다. </Text>} 
-			<View style={{ marginTop: "5%"}}></View>
-			<CustomButton 
-				onPress={onSignUpPressed}
-				text="회원가입"
-			/>
-		</View>
+                invalidFlag={confirmPasswordError}
+                invalidText="입력하신 비밀번호와 다릅니다."
+            />
+            <View style={{ marginTop: '5%' }}></View>
+            <CustomButton onPress={onSignUpPressed} text="회원가입" />
+        </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
-	container: {
-		marginTop: '30%',
+    container: {
+        marginTop: '30%',
         marginLeft: '9%',
-		marginRight: '9%'
-	},
+        marginRight: '9%',
+    },
     text: {
         fontSize: 25,
         fontWeight: '500',
-        color: '#FFFFFF',
         lineHeight: 29.3,
-		marginBottom:'5%'
+        marginBottom: '8%',
     },
-	label: {
+    label: {
         marginTop: '1%',
-		fontSize: 14,
-        color: '#FFFFFF',
+        fontSize: 14,
         lineHeight: 29.3,
-	}, 
+    },
     invalid: {
         fontSize: 11,
-        color: 'blue'
-    }
- })
-    
+        color: 'blue',
+    },
+});
 
 export default SignUpScreen;

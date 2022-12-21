@@ -2,17 +2,12 @@ import React from 'react';
 import { View, Text, Pressable, Image, StyleSheet } from 'react-native';
 
 const CustomButton = ({ onPress, text }) => {
-	return (
-    	<Pressable
-        	onPress={onPress}
-            style={styles.container}
-        >
-        	<Text style={styles.text}>
-            	{text}
-            </Text>
+    return (
+        <Pressable onPress={onPress} style={styles.container}>
+            <Text style={styles.text}>{text}</Text>
         </Pressable>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -23,13 +18,13 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         backgroundColor: '#E5EBFF',
         alignSelf: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
     text: {
         color: '#545454',
         fontWeight: '700',
-        fontSize: 15
-    }
+        fontSize: 15,
+    },
 });
 
 export default CustomButton;
