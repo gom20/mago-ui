@@ -1,7 +1,9 @@
 import { NavigationContainer } from '@react-navigation/native';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
-import AuthStack from './navigations/AppStack';
+import AppStack from './navigations/AppStack';
+import { store } from './store';
+import { Provider } from 'react-redux';
 
 export default function App() {
     function sleep(ms) {
@@ -19,8 +21,10 @@ export default function App() {
     });
 
     return (
-        <NavigationContainer>
-            <AuthStack />
-        </NavigationContainer>
+        <Provider store={store}>
+            <NavigationContainer>
+                <AppStack />
+            </NavigationContainer>
+        </Provider>
     );
 }

@@ -1,13 +1,12 @@
-import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
-import HomeScreen from '../screens/HomeScreen';
-import SignInScreen from '../screens/SignInScreen';
-import SignUpScreen from '../screens/SignUpScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
+import React from 'react';
 import DiaryScreen from '../screens/DiaryScreen';
-import HikingScreen from '../screens/HikingScreen';
 import GpsScreen from '../screens/GpsScreen';
+import HikingScreen from '../screens/HikingScreen';
 import RecordScreen from '../screens/RecordScreen';
+import LoginScreen from '../screens/LoginScreen';
+import SignUpScreen from '../screens/SignUpScreen';
 
 const Stack = createStackNavigator();
 const HikingStack = createStackNavigator();
@@ -47,12 +46,12 @@ const AppTabComponent = () => {
     );
 };
 
-const AuthStack = () => {
+const AppStack = () => {
     return (
         <Stack.Navigator initialRouteName="SignIn">
             <Stack.Screen
                 name="SignIn"
-                component={SignInScreen}
+                component={LoginScreen}
                 options={{ headerShown: false }}
             />
             <Stack.Screen
@@ -65,4 +64,4 @@ const AuthStack = () => {
     );
 };
 
-export default AuthStack;
+export default AppStack;

@@ -1,15 +1,30 @@
-import React, { useState } from 'react';
-import { View, Text, Pressable, Image, StyleSheet, Alert } from 'react-native';
-import CustomInput from '../components/CustomInput';
-import CustomButton from '../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useState } from 'react';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import CustomButton from '../components/CustomButton';
+import CustomInput from '../components/CustomInput';
 import getEnvVars from '../environment';
+import { login } from '../slices/authSlice';
+import { clearMessage } from '../slices/messageSlice';
 
-const SignInScreen = () => {
+const LoginScreen = () => {
     const ENV = getEnvVars();
     const navigation = useNavigation();
+
+    const { isLoggedIn, user } = useSelector((state) => ({
+        isLoggedIn: state.auth.isLoggedIn,
+        user: state.auth.user,
+    }));
+
+    const { message } = useSelector((state) => state.message);
+
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(clearMessage());
+    }, [dispatch]);
+
+    const [loading, setLoading] = useState(false);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -22,36 +37,26 @@ const SignInScreen = () => {
         password ? setPasswordError(false) : setPasswordError(true);
         return false;
     };
-    const onSignInPressed = () => {
+
+    const onSignInPressed = async () => {
         if (!validateInputs()) return;
 
         const submitData = {
             email: email ? email : 'rhaldud89@test.com',
             password: password ? password : 'test',
         };
-        axios({
-            method: 'post',
-            url: ENV.apiDomain + '/api/members/login',
-            data: JSON.stringify(submitData),
-            headers: {
-                'Content-Type': 'application/json; charset=utf-8',
-            },
-        })
-            .then(function (response) {
-                if (response.data.code == 0) {
-                    AsyncStorage.setItem(
-                        'userData',
-                        JSON.stringify({
-                            username: 'rhaldud89@gmail.com',
-                            token: response.data.data.token,
-                        }),
-                        () => {
-                            navigation.navigate('AppTabComponent');
-                        }
-                    );
-                }
+
+        // setLoading(true);
+        console.error(JSON.stringify(submitData));
+
+        dispatch(login(JSON.stringify(submitData)))
+            .unwrap()
+            .then(() => {
+                navigation.navigate('AppTabComponent');
             })
-            .catch(function (error) {});
+            .catch(() => {
+                setLoading(false);
+            });
     };
 
     const onSignUpPressed = async (data) => {
@@ -155,4 +160,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SignInScreen;
+export default LoginScreen;
