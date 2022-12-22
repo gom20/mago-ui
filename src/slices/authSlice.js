@@ -11,7 +11,7 @@ export const register = createAsyncThunk(
         try {
             const response = await authAPI.register(username, email, password);
             thunkAPI.dispatch(setMessage(response.data.message));
-            return response.data;
+            return response;
         } catch (error) {
             const message =
                 (error.response &&
@@ -29,8 +29,8 @@ export const login = createAsyncThunk(
     'auth/login',
     async (reqData, thunkAPI) => {
         try {
-            const data = await authAPI.login(reqData);
-            return { user: data };
+            const response = await authAPI.login(reqData);
+            return response;
         } catch (error) {
             const message =
                 (error.response &&

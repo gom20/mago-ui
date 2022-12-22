@@ -13,7 +13,6 @@ const login = (request) => {
     return api
         .post('auth/login', request)
         .then((response) => {
-            alert('loginsuccess');
             // console.warn('response' + response);
             // if (response.data.code == 0) {
             //     AsyncStorage.setItem(
@@ -21,10 +20,10 @@ const login = (request) => {
             //         response.data.data.token
             //     );
             // }
-            return response.data;
+            return response;
         })
         .catch((error) => {
-            console.error('error');
+            alert(error);
         });
 };
 

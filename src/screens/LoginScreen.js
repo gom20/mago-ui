@@ -4,19 +4,17 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import CustomButton from '../components/CustomButton';
 import CustomInput from '../components/CustomInput';
-import getEnvVars from '../environment';
+import CustomActivityIndicator from '../components/CustomActivityIndicator';
 import { login } from '../slices/authSlice';
 import { clearMessage } from '../slices/messageSlice';
 
 const LoginScreen = () => {
-    const ENV = getEnvVars();
     const navigation = useNavigation();
 
     const { isLoggedIn, user } = useSelector((state) => ({
         isLoggedIn: state.auth.isLoggedIn,
         user: state.auth.user,
     }));
-
     const { message } = useSelector((state) => state.message);
 
     const dispatch = useDispatch();
@@ -25,33 +23,29 @@ const LoginScreen = () => {
     }, [dispatch]);
 
     const [loading, setLoading] = useState(false);
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [emailError, setEmailError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
 
-    const validateInputs = () => {
-        if (email && password) return true;
-        email ? setEmailError(false) : setEmailError(true);
-        password ? setPasswordError(false) : setPasswordError(true);
-        return false;
-    };
-
-    const onSignInPressed = async () => {
-        if (!validateInputs()) return;
-
-        const submitData = {
-            email: email ? email : 'rhaldud89@test.com',
-            password: password ? password : 'test',
+    const onLoginPressed = async () => {
+        const _validateInputs = () => {
+            email ? setEmailError(false) : setEmailError(true);
+            password ? setPasswordError(false) : setPasswordError(true);
+            return email && password ? true : false;
         };
 
-        // setLoading(true);
-        console.error(JSON.stringify(submitData));
+        if (!_validateInputs()) return;
+        const req = JSON.stringify({
+            email: email,
+            password: password,
+        });
 
-        dispatch(login(JSON.stringify(submitData)))
+        setLoading(true);
+        dispatch(login(req))
             .unwrap()
-            .then(() => {
+            .then((res) => {
+                setLoading(false);
                 navigation.navigate('AppTabComponent');
             })
             .catch(() => {
@@ -73,53 +67,65 @@ const LoginScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>안녕하세요,</Text>
-            <Text style={styles.text}>MAGO 입니다.</Text>
-            <Text style={styles.smallText}>
-                서비스 이용을 위해 로그인 해주세요.
-            </Text>
+            <View style={styles.inputContainer}>
+                <Text style={styles.text}>안녕하세요,</Text>
+                <Text style={styles.text}>MAGO 입니다.</Text>
+                <Text style={styles.smallText}>
+                    서비스 이용을 위해 로그인 해주세요.
+                </Text>
 
-            <CustomInput
-                value={email}
-                setValue={setEmail}
-                placeholder="이메일"
-                invalidFlag={emailError}
-                invalidText="이메일을 입력해 주세요."
-            />
-            <CustomInput
-                value={password}
-                setValue={setPassword}
-                placeholder="비밀번호"
-                invalidFlag={passwordError}
-                invalidText="비밀번호를 입력해 주세요."
-                secureTextEntry
-            />
-            <CustomButton onPress={onSignInPressed} text="로그인" />
-
-            <View style={styles.line} />
-
-            <Pressable onPress={onSocialLoginPressed}>
-                <Image
-                    style={styles.image}
-                    source={require('./../assets/images/kakao_login_medium_wide.png')}
+                <CustomInput
+                    value={email}
+                    setValue={setEmail}
+                    placeholder="이메일"
+                    invalidFlag={emailError}
+                    invalidText="이메일을 입력해 주세요."
                 />
-            </Pressable>
+                <CustomInput
+                    value={password}
+                    setValue={setPassword}
+                    placeholder="비밀번호"
+                    invalidFlag={passwordError}
+                    invalidText="비밀번호를 입력해 주세요."
+                    secureTextEntry
+                />
+                <CustomButton onPress={onLoginPressed} text="로그인" />
 
-            <View style={styles.otherButtonContainer}>
-                <Pressable onPress={onForgotPasswordPressed}>
-                    <Text style={styles.otherButtonText}>비밀번호 찾기 </Text>
+                <View style={styles.line} />
+
+                <Pressable onPress={onSocialLoginPressed}>
+                    <Image
+                        style={styles.image}
+                        source={require('./../assets/images/kakao_login_medium_wide.png')}
+                    />
                 </Pressable>
-                <Text style={styles.otherButtonText}>|</Text>
-                <Pressable onPress={onSignUpPressed}>
-                    <Text style={styles.otherButtonText}> 회원가입 하기</Text>
-                </Pressable>
+
+                <View style={styles.otherButtonContainer}>
+                    <Pressable onPress={onForgotPasswordPressed}>
+                        <Text style={styles.otherButtonText}>
+                            비밀번호 찾기{' '}
+                        </Text>
+                    </Pressable>
+                    <Text style={styles.otherButtonText}>|</Text>
+                    <Pressable onPress={onSignUpPressed}>
+                        <Text style={styles.otherButtonText}>
+                            {' '}
+                            회원가입 하기
+                        </Text>
+                    </Pressable>
+                </View>
             </View>
+            {loading && <CustomActivityIndicator />}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
+        width: '100%',
+        height: '100%',
+    },
+    inputContainer: {
         marginTop: '40%',
         marginLeft: '9%',
         marginRight: '9%',
@@ -127,16 +133,14 @@ const styles = StyleSheet.create({
     text: {
         fontSize: 25,
         fontWeight: '500',
-        // color: '#FFFFFF',
+
         lineHeight: 29.3,
     },
     smallText: {
         fontSize: 12,
         fontWeight: '300',
-        // color: '#FFFFFF',
         marginTop: 5,
         marginBottom: 50,
-        // color: '#EEEEEE',
     },
     line: {
         borderBottomColor: 'gray',
@@ -156,8 +160,8 @@ const styles = StyleSheet.create({
     otherButtonText: {
         fontWeight: '500',
         fontSize: 12,
-        // color: '#EEEEEE',
     },
+    loading: {},
 });
 
 export default LoginScreen;
