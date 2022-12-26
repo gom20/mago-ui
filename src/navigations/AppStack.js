@@ -4,7 +4,7 @@ import React from 'react';
 import DiaryScreen from '../screens/DiaryScreen';
 import GpsScreen from '../screens/GpsScreen';
 import HikingScreen from '../screens/HikingScreen';
-import RecordScreen from '../screens/RecordScreen';
+import RecordScreen from '../screens/FeedScreen';
 import LoginScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 

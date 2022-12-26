@@ -11,6 +11,7 @@ const CustomInput = ({
     label,
     invalidFlag,
     invalidText,
+    maxLength,
 }) => {
     return (
         <View style={styles.container}>
@@ -22,6 +23,7 @@ const CustomInput = ({
                 placeholder={placeholder}
                 style={styles.input}
                 secureTextEntry={secureTextEntry}
+                maxLength={maxLength ? maxLength : 50}
             />
             {invalidFlag && (
                 <View style={{ flexDirection: 'row' }}>

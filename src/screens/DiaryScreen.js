@@ -1,9 +1,19 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { Platform, Text, View, StyleSheet, Dimensions, Image, Pressable, FlatList, SafeAreaView } from 'react-native';
+import {
+    Platform,
+    Text,
+    View,
+    StyleSheet,
+    Dimensions,
+    Image,
+    Pressable,
+    FlatList,
+    SafeAreaView,
+} from 'react-native';
 import * as Location from 'expo-location';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
-import axios from "axios";
+import axios from 'axios';
 // import Geolocation from 'react-native-geolocation-service';
 import getEnvVars from '../environment';
 
@@ -18,9 +28,9 @@ function DiaryScreen() {
             // data: JSON.stringify({
             // 	'username': 'rhaldud89@gmail.com',
             // 	'password': 'test'
-            // }), 
+            // }),
             headers: {
-                "Content-Type": "application/json; charset=utf-8"
+                'Content-Type': 'application/json; charset=utf-8',
             },
             // timeout: 5000
         })
@@ -36,17 +46,14 @@ function DiaryScreen() {
                     // 	navigation.navigate('AppTabComponent');
                     // })
                 } else {
-
                 }
             })
-            .catch(function (error) {
-
-            });
-    }
+            .catch(function (error) {});
+    };
 
     useEffect(() => {
         apiCall();
-        console.log("useEffect를 활용한 componentDidMount");
+        console.log('useEffect를 활용한 componentDidMount');
     }, []);
 
     const renderItem = ({ item }) => {
@@ -79,13 +86,12 @@ const styles = StyleSheet.create({
     container: {
         marginTop: '9%',
         marginLeft: '9%',
-		    marginRight: '9%'
+        marginRight: '9%',
     },
     item: {
         borderBottomWidth: 1,
         height: 100,
     },
 });
-
 
 export default DiaryScreen;

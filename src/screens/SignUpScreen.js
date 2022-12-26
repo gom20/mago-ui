@@ -1,13 +1,12 @@
 import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useDispatch } from 'react-redux';
 import CustomButton from '../components/CustomButton';
 import CustomInput from '../components/CustomInput';
-import getEnvVars from '../environment';
+import { signup } from '../slices/authSlice';
 
 const SignUpScreen = () => {
-    const ENV = getEnvVars();
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
@@ -17,6 +16,7 @@ const SignUpScreen = () => {
     const [passwordError, setPasswordError] = useState(false);
     const [confirmPasswordError, setConfirmPasswordError] = useState(false);
 
+    const dispatch = useDispatch();
     const navigation = useNavigation();
 
     const validateInputs = () => {
@@ -56,29 +56,18 @@ const SignUpScreen = () => {
     const onSignUpPressed = () => {
         if (!validateInputs()) return;
 
-        axios({
-            method: 'post',
-            url: ENV.apiDomain + '/api/members',
-            data: JSON.stringify({
+        dispatch(
+            signup({
                 email: email,
                 name: name,
                 password: password,
-            }),
-            headers: {
-                'Content-Type': 'application/json; charset=utf-8',
-            },
-        })
-            .then(function (response) {
-                console.error(response);
-                if (response.data.code == 0) {
-                    navigation.navigate('SignIn');
-                } else {
-                    alert('server error');
-                }
             })
-            .catch(function (error) {
-                alert('internal error');
-            });
+        )
+            .unwrap()
+            .then((res) => {
+                navigation.navigate('SignIn');
+            })
+            .catch((error) => {});
     };
 
     return (
@@ -91,6 +80,7 @@ const SignUpScreen = () => {
                 placeholder="이메일"
                 invalidFlag={emailError}
                 invalidText="이메일을 입력해 주세요."
+                maxLength={50}
             />
             <CustomInput
                 label="이름"
@@ -99,6 +89,7 @@ const SignUpScreen = () => {
                 placeholder="이름"
                 invalidFlag={nameError}
                 invalidText="이름을 입력해 주세요."
+                maxLength={50}
             />
             <CustomInput
                 label="비밀번호"
@@ -108,6 +99,7 @@ const SignUpScreen = () => {
                 secureTextEntry={true}
                 invalidFlag={passwordError}
                 invalidText="영문자, 숫자 조합으로 8자 이상 입력해주세요."
+                maxLength={20}
             />
             <CustomInput
                 label="비밀번호 확인"
@@ -117,6 +109,7 @@ const SignUpScreen = () => {
                 secureTextEntry={true}
                 invalidFlag={confirmPasswordError}
                 invalidText="입력하신 비밀번호와 다릅니다."
+                maxLength={20}
             />
             <View style={{ marginTop: '5%' }}></View>
             <CustomButton onPress={onSignUpPressed} text="회원가입" />
@@ -130,6 +123,7 @@ const styles = StyleSheet.create({
         marginLeft: '9%',
         marginRight: '9%',
     },
+
     text: {
         fontSize: 25,
         fontWeight: '500',

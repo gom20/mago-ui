@@ -1,25 +1,15 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { setMessage } from './messageSlice';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import authAPI from '../apis/authAPI';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const user = {};
 
-export const register = createAsyncThunk(
-    'auth/register',
-    async ({ username, email, password }, thunkAPI) => {
+export const signup = createAsyncThunk(
+    'auth/signup',
+    async (reqData, thunkAPI) => {
         try {
-            const response = await authAPI.register(username, email, password);
-            thunkAPI.dispatch(setMessage(response.data.message));
+            const response = await authAPI.signup(reqData);
             return response;
         } catch (error) {
-            const message =
-                (error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                error.message ||
-                error.toString();
-            thunkAPI.dispatch(setMessage(message));
             return thunkAPI.rejectWithValue();
         }
     }
@@ -32,13 +22,6 @@ export const login = createAsyncThunk(
             const response = await authAPI.login(reqData);
             return response;
         } catch (error) {
-            const message =
-                (error.response &&
-                    error.response.data &&
-                    error.response.data.message) ||
-                error.message ||
-                error.toString();
-            thunkAPI.dispatch(setMessage(message));
             return thunkAPI.rejectWithValue();
         }
     }
@@ -57,10 +40,10 @@ const authSlice = createSlice({
     initialState,
     extraReducers: (builder) => {
         builder
-            .addCase(register.fulfilled, (state, action) => {
+            .addCase(signup.fulfilled, (state, action) => {
                 state.isLoggedIn = false;
             })
-            .addCase(register.rejected, (state, action) => {
+            .addCase(signup.rejected, (state, action) => {
                 state.isLoggedIn = false;
             })
             .addCase(login.fulfilled, (state, action) => {

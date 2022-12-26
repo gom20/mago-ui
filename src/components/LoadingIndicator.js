@@ -1,10 +1,14 @@
+import { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { useSelector } from 'react-redux';
 
-const CustomActivityIndicator = () => {
+const LoadingIndicator = ({ loading }) => {
     return (
-        <View style={styles.container} pointerEvents={'box-only'}>
-            <ActivityIndicator size="large" color="orange" />
-        </View>
+        loading && (
+            <View style={styles.container} pointerEvents={'box-only'}>
+                <ActivityIndicator size="large" color="orange" />
+            </View>
+        )
     );
 };
 
@@ -21,4 +25,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CustomActivityIndicator;
+export default LoadingIndicator;
