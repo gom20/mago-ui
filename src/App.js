@@ -21,7 +21,7 @@ export default function App() {
     }
 
     useEffect(() => {
-        delaySplash();
+        // delaySplash();
 
         api.interceptors.request.use(
             function (config) {
@@ -41,9 +41,13 @@ export default function App() {
             },
             function (error) {
                 setLoading(false);
-                // 전역 에러 처리
-                console.error(error);
-                console.error(error.response);
+                const errorMsg =
+                    error.response &&
+                    error.response.data &&
+                    error.response.data.message
+                        ? error.response.data.message
+                        : error.message || error.toString();
+                alert(errorMsg);
                 return Promise.reject(error);
             }
         );

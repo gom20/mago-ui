@@ -7,6 +7,7 @@ import HikingScreen from '../screens/HikingScreen';
 import RecordScreen from '../screens/FeedScreen';
 import LoginScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
+import PwResetScreen from '../screens/PwResetScreen';
 
 const Stack = createStackNavigator();
 const HikingStack = createStackNavigator();
@@ -57,6 +58,11 @@ const AppStack = () => {
             <Stack.Screen
                 name="SignUp"
                 component={SignUpScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="PwReset"
+                component={PwResetScreen}
                 options={{ headerShown: false }}
             />
             <Stack.Screen name="AppTabComponent" component={AppTabComponent} />

@@ -64,7 +64,7 @@ const SignUpScreen = () => {
             })
         )
             .unwrap()
-            .then((res) => {
+            .then((response) => {
                 navigation.navigate('SignIn');
             })
             .catch((error) => {});

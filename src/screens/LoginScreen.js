@@ -30,7 +30,7 @@ const LoginScreen = () => {
             })
         )
             .unwrap()
-            .then((res) => {
+            .then((response) => {
                 navigation.navigate('AppTabComponent');
             })
             .catch((error) => {});
@@ -44,8 +44,8 @@ const LoginScreen = () => {
         alert('onSocialLoginPressed');
     };
 
-    const onForgotPasswordPressed = () => {
-        alert('onForgotPasswordPressed');
+    const onPwResetPressed = () => {
+        navigation.navigate('PwReset');
     };
 
     return (
@@ -85,8 +85,8 @@ const LoginScreen = () => {
             </Pressable>
 
             <View style={styles.otherButtonContainer}>
-                <Pressable onPress={onForgotPasswordPressed}>
-                    <Text style={styles.otherButtonText}>비밀번호 찾기 </Text>
+                <Pressable onPress={onPwResetPressed}>
+                    <Text style={styles.otherButtonText}>비밀번호 재설정 </Text>
                 </Pressable>
                 <Text style={styles.otherButtonText}>|</Text>
                 <Pressable onPress={onSignUpPressed}>
