@@ -2,9 +2,9 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useDispatch } from 'react-redux';
-import CustomButton from '../components/CustomButton';
-import CustomInput from '../components/CustomInput';
-import { signup } from '../slices/authSlice';
+import CustomButton from '../../components/CustomButton';
+import CustomInput from '../../components/CustomInput';
+import { signup } from './authSlice';
 
 const SignUpScreen = () => {
     const [email, setEmail] = useState('');

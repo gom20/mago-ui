@@ -12,10 +12,10 @@ import {
 import * as Location from 'expo-location';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
-import CustomInput from '../components/CustomInput';
+import CustomInput from '../../components/CustomInput';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import getEnvVars from '../environment';
+import getEnvVars from '../../environment';
 // import Geolocation from 'react-native-geolocation-service';
 
 function RecordScreen() {

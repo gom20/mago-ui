@@ -1,4 +1,4 @@
-import api from './api';
+import api from '../../apis/api';
 
 API_URL = 'feeds/';
 

@@ -1,13 +1,13 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import DiaryScreen from '../screens/DiaryScreen';
-import GpsScreen from '../screens/GpsScreen';
-import HikingScreen from '../screens/HikingScreen';
-import RecordScreen from '../screens/FeedScreen';
-import LoginScreen from '../screens/LoginScreen';
-import SignUpScreen from '../screens/SignUpScreen';
-import PwResetScreen from '../screens/PwResetScreen';
+import DiaryScreen from '../features/feed/FeedListScreen';
+import GpsScreen from '../features/hiking/GpsScreen';
+import HikingScreen from '../features/hiking/HikingScreen';
+import RecordScreen from '../features/feed/FeedScreen';
+import LoginScreen from '../features/auth/LoginScreen';
+import SignUpScreen from '../features/auth/SignUpScreen';
+import PwResetScreen from '../features/auth/PwResetScreen';
 
 const Stack = createStackNavigator();
 const HikingStack = createStackNavigator();

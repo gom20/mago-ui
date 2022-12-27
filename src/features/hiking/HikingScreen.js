@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, Image, StyleSheet } from 'react-native';
-import List from '../components/List';
+import List from './List';
 
 const HikingScreen = () => {
     return (

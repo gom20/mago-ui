@@ -2,9 +2,9 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useDispatch } from 'react-redux';
-import CustomButton from '../components/CustomButton';
-import CustomInput from '../components/CustomInput';
-import { login } from '../slices/authSlice';
+import CustomButton from '../../components/CustomButton';
+import CustomInput from '../../components/CustomInput';
+import { login } from './authSlice';
 
 const LoginScreen = () => {
     const [email, setEmail] = useState('');
@@ -31,6 +31,7 @@ const LoginScreen = () => {
         )
             .unwrap()
             .then((response) => {
+                console.error(response);
                 navigation.navigate('AppTabComponent');
             })
             .catch((error) => {});
@@ -80,7 +81,7 @@ const LoginScreen = () => {
             <Pressable onPress={onSocialLoginPressed}>
                 <Image
                     style={styles.image}
-                    source={require('./../assets/images/kakao_login_medium_wide.png')}
+                    source={require('../../assets/images/kakao_login_medium_wide.png')}
                 />
             </Pressable>
 

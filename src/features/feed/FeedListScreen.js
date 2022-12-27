@@ -15,7 +15,7 @@ import MapView, { Marker, Polyline } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 // import Geolocation from 'react-native-geolocation-service';
-import getEnvVars from '../environment';
+import getEnvVars from '../../environment';
 
 function DiaryScreen() {
     const [feeds, setFeeds] = useState([]);

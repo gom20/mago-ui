@@ -1,7 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import authAPI from '../apis/authAPI';
-
-const user = {};
+import authAPI from './authAPI';
 
 export const signup = createAsyncThunk(
     'auth/signup',
@@ -27,13 +26,41 @@ export const login = createAsyncThunk(
     }
 );
 
-export const logout = createAsyncThunk('auth/logout', async () => {
-    await authAPI.logout();
-});
+export const logout = createAsyncThunk(
+    'auth/logout',
+    async (request, thunkAPI) => {
+        await authAPI.logout();
+    }
+);
 
+export const sendPassword = createAsyncThunk(
+    'auth/sendPassword',
+    async (request, thunkAPI) => {
+        try {
+            const response = await authAPI.sendPassword(request);
+            return response;
+        } catch (error) {
+            return thunkAPI.rejectWithValue();
+        }
+    }
+);
+
+const getUser = async () => {
+    try {
+        const user = await AsyncStorage.getItem('user');
+        console.error(user);
+        console.error('??');
+        console.error(JSON.parse(user));
+        return JSON.parse(user);
+    } catch (error) {
+        return null;
+    }
+};
+
+user = {};
 const initialState = user
-    ? { isLoggedIn: true, user }
-    : { isLoggedIn: false, user: null };
+    ? { isLogged: true, user }
+    : { isLogged: false, user: null };
 
 const authSlice = createSlice({
     name: 'auth',
@@ -41,21 +68,21 @@ const authSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(signup.fulfilled, (state, action) => {
-                state.isLoggedIn = false;
+                state.isLogged = false;
             })
             .addCase(signup.rejected, (state, action) => {
-                state.isLoggedIn = false;
+                state.isLogged = false;
             })
             .addCase(login.fulfilled, (state, action) => {
-                state.isLoggedIn = true;
-                state.user = action.payload.user;
+                state.isLogged = true;
+                state.user = action.payload.data.user;
             })
             .addCase(login.rejected, (state, action) => {
-                state.isLoggedIn = false;
+                state.isLogged = false;
                 state.user = null;
             })
             .addCase(logout.fulfilled, (state, action) => {
-                state.isLoggedIn = false;
+                state.isLogged = false;
                 state.user = null;
             })
             .addDefaultCase((state, action) => {});

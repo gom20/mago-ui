@@ -1,8 +1,9 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
-import api from './apis/api';
+import api from './base/api';
 import LoadingIndicator from './components/LoadingIndicator';
 import AppStack from './navigations/AppStack';
 import { store } from './store';
@@ -24,8 +25,12 @@ export default function App() {
         // delaySplash();
 
         api.interceptors.request.use(
-            function (config) {
+            async function (config) {
                 setLoading(true);
+                const token = await AsyncStorage.getItem('token');
+                if (token) {
+                    config.headers.Authorization = 'Bearer ' + token;
+                }
                 config.request = JSON.stringify(config.request);
                 return config;
             },
@@ -48,7 +53,7 @@ export default function App() {
                         ? error.response.data.message
                         : error.message || error.toString();
                 alert(errorMsg);
-                return Promise.reject(error);
+                return Promise.reject(error.resposne || error);
             }
         );
     }, []);
