@@ -7,7 +7,8 @@ import HikingScreen from '../features/hiking/HikingScreen';
 import RecordScreen from '../features/feed/FeedScreen';
 import LoginScreen from '../features/auth/LoginScreen';
 import SignUpScreen from '../features/auth/SignUpScreen';
-import PwResetScreen from '../features/auth/PwResetScreen';
+import PasswordReset from '../features/auth/PasswordResetScreen';
+import { useSelector } from 'react-redux';
 
 const Stack = createStackNavigator();
 const HikingStack = createStackNavigator();
@@ -48,8 +49,11 @@ const AppTabComponent = () => {
 };
 
 const AppStack = () => {
+    const auth = useSelector((state) => state.auth);
+    const initScreen = auth.isLogged ? 'AppTabComponent' : 'SignIn';
+
     return (
-        <Stack.Navigator initialRouteName="SignIn">
+        <Stack.Navigator initialRouteName={initScreen}>
             <Stack.Screen
                 name="SignIn"
                 component={LoginScreen}
@@ -61,8 +65,8 @@ const AppStack = () => {
                 options={{ headerShown: false }}
             />
             <Stack.Screen
-                name="PwReset"
-                component={PwResetScreen}
+                name="PasswordReset"
+                component={PasswordReset}
                 options={{ headerShown: false }}
             />
             <Stack.Screen name="AppTabComponent" component={AppTabComponent} />

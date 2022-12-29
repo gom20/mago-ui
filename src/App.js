@@ -1,29 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { NavigationContainer } from '@react-navigation/native';
-import * as SplashScreen from 'expo-splash-screen';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 import api from './base/api';
 import LoadingIndicator from './components/LoadingIndicator';
 import AppStack from './navigations/AppStack';
-import { store } from './store';
+import { store, persistor } from './store';
 
 export default function App() {
     const [loading, setLoading] = useState(false);
 
-    function sleep(ms) {
-        return new Promise((resolve) => setTimeout(resolve, ms));
-    }
-
-    async function delaySplash() {
-        await SplashScreen.preventAutoHideAsync();
-        await sleep(5000);
-        await SplashScreen.hideAsync();
-    }
-
     useEffect(() => {
-        // delaySplash();
-
         api.interceptors.request.use(
             async function (config) {
                 setLoading(true);
@@ -60,10 +48,12 @@ export default function App() {
 
     return (
         <Provider store={store}>
-            <NavigationContainer>
-                <AppStack />
-            </NavigationContainer>
-            <LoadingIndicator loading={loading} />
+            <PersistGate loading={null} persistor={persistor}>
+                <NavigationContainer>
+                    <AppStack />
+                </NavigationContainer>
+                <LoadingIndicator loading={loading} />
+            </PersistGate>
         </Provider>
     );
 }

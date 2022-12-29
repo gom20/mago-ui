@@ -1,7 +1,8 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
 import { login } from './authSlice';
@@ -46,7 +47,7 @@ const LoginScreen = () => {
     };
 
     const onPwResetPressed = () => {
-        navigation.navigate('PwReset');
+        navigation.navigate('PasswordReset');
     };
 
     return (

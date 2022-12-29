@@ -10,19 +10,14 @@ const signup = (request) => {
 };
 
 const login = (request) => {
-    return api.post('auth/login', request).then(async (response) => {
-        await AsyncStorage.setItem('token', response.data.token);
-        await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
+    return api.post('auth/login', request).then((response) => {
         return response;
     });
 };
 
 const sendPassword = (request) => {
     return api.post('auth/sendPassword', request).then(async (response) => {
-        await AsyncAlert(
-            'Alert',
-            '임시 비밀번호가 전송되었습니다. 로그인 후 비밀번호를 변경해주세요.'
-        );
+        await AsyncAlert('Alert', '임시 비밀번호가 전송되었습니다.');
         return response;
     });
 };

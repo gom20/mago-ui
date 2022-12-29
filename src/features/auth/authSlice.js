@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import authAPI from './authAPI';
 
@@ -26,13 +25,6 @@ export const login = createAsyncThunk(
     }
 );
 
-export const logout = createAsyncThunk(
-    'auth/logout',
-    async (request, thunkAPI) => {
-        await authAPI.logout();
-    }
-);
-
 export const sendPassword = createAsyncThunk(
     'auth/sendPassword',
     async (request, thunkAPI) => {
@@ -45,26 +37,19 @@ export const sendPassword = createAsyncThunk(
     }
 );
 
-const getUser = async () => {
-    try {
-        const user = await AsyncStorage.getItem('user');
-        console.error(user);
-        console.error('??');
-        console.error(JSON.parse(user));
-        return JSON.parse(user);
-    } catch (error) {
-        return null;
-    }
-};
-
-user = {};
-const initialState = user
-    ? { isLogged: true, user }
-    : { isLogged: false, user: null };
+const initialState = { isLogged: false, token: null, user: null };
 
 const authSlice = createSlice({
     name: 'auth',
     initialState,
+    reducers: {
+        logout(state) {
+            console.error('TEST');
+            state.isLogged = false;
+            state.token = null;
+            state.user = null;
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(signup.fulfilled, (state, action) => {
@@ -75,18 +60,17 @@ const authSlice = createSlice({
             })
             .addCase(login.fulfilled, (state, action) => {
                 state.isLogged = true;
+                state.token = action.payload.data.token;
                 state.user = action.payload.data.user;
             })
             .addCase(login.rejected, (state, action) => {
                 state.isLogged = false;
-                state.user = null;
-            })
-            .addCase(logout.fulfilled, (state, action) => {
-                state.isLogged = false;
+                state.token = null;
                 state.user = null;
             })
             .addDefaultCase((state, action) => {});
     },
 });
 
+export const { logout } = authSlice.actions;
 export default authSlice.reducer;
