@@ -9,6 +9,9 @@ import LoginScreen from '../features/auth/LoginScreen';
 import SignUpScreen from '../features/auth/SignUpScreen';
 import PasswordReset from '../features/auth/PasswordResetScreen';
 import { useSelector } from 'react-redux';
+import OnboardScreen from '../features/auth/OnboardScreen';
+import SignUpSuccessScreen from '../features/auth/SignUpSucessScreen';
+import { Image } from 'react-native';
 
 const Stack = createStackNavigator();
 const HikingStack = createStackNavigator();
@@ -50,24 +53,46 @@ const AppTabComponent = () => {
 
 const AppStack = () => {
     const auth = useSelector((state) => state.auth);
-    const initScreen = auth.isLogged ? 'AppTabComponent' : 'SignIn';
+    const initScreen = auth.isLogged ? 'AppTabComponent' : 'Onboard';
 
     return (
-        <Stack.Navigator initialRouteName={initScreen}>
+        <Stack.Navigator
+            initialRouteName={initScreen}
+            screenOptions={{
+                headerTitle: '',
+                headerStyle: { elevation: 0 },
+                cardStyle: { backgroundColor: '#FFFFFF' },
+                headerBackImage: () => (
+                    <Image
+                        source={require('../assets/images/back_button.png')}
+                    ></Image>
+                ),
+            }}
+        >
             <Stack.Screen
-                name="SignIn"
-                component={LoginScreen}
+                name="Onboard"
+                component={OnboardScreen}
                 options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="Login"
+                component={LoginScreen}
+                options={{ headerShown: true }}
             />
             <Stack.Screen
                 name="SignUp"
                 component={SignUpScreen}
+                options={{ headerShown: true }}
+            />
+            <Stack.Screen
+                name="SignUpSuccess"
+                component={SignUpSuccessScreen}
                 options={{ headerShown: false }}
             />
             <Stack.Screen
                 name="PasswordReset"
                 component={PasswordReset}
-                options={{ headerShown: false }}
+                options={{ headerShown: true }}
             />
             <Stack.Screen name="AppTabComponent" component={AppTabComponent} />
         </Stack.Navigator>

@@ -46,14 +46,15 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 14,
         marginBottom: 5,
-        fontWeight: 'bold',
     },
     input: {
         backgroundColor: '#FFFFFF',
         height: 48,
         paddingLeft: 15,
-        borderRadius: 5,
+        borderRadius: 25,
         marginBottom: 5,
+        borderWidth: 1,
+        borderColor: '#000000',
     },
     invalid: {
         fontSize: 12,

@@ -8,7 +8,6 @@ const api = axios.create({
     baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json; charset=utf-8',
-        // access_token: cookies.get('access_token'),
     },
     timeout: 5000,
     validateStatus: (status) => {

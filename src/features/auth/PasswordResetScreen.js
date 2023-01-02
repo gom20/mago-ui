@@ -38,51 +38,65 @@ const PwResetScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>
-                임시 비밀번호 발급을 위해 이메일과 이름을 입력해주세요.
-            </Text>
-            <Text style={styles.smallText}>
-                본인확인 이메일 주소와 입력한 이메일 주소가 같아야, 임시
-                비밀번호를 받을 수 있습니다.
-            </Text>
-
-            <CustomInput
-                value={email}
-                setValue={setEmail}
-                placeholder="이메일"
-                invalidFlag={emailError}
-                invalidText="이메일을 입력해 주세요."
-                maxLength={50}
-            />
-            <CustomInput
-                value={name}
-                setValue={setName}
-                placeholder="이름"
-                invalidFlag={nameError}
-                invalidText="이름을 입력해 주세요."
-                maxLength={50}
-            />
-            <CustomButton onPress={onSubmitPressed} text="임시 비밀번호 발급" />
+            <View>
+                <Text style={styles.text}>비밀번호 재설정</Text>
+                <Text style={styles.smallText}>
+                    회원가입 시 작성한 이메일과 이름을 입력해주세요.
+                </Text>
+            </View>
+            <View style={styles.inputContainer}>
+                <CustomInput
+                    value={email}
+                    setValue={setEmail}
+                    placeholder="이메일"
+                    invalidFlag={emailError}
+                    invalidText="이메일을 입력해 주세요."
+                    maxLength={50}
+                    label="이메일"
+                />
+                <CustomInput
+                    value={name}
+                    setValue={setName}
+                    placeholder="이름"
+                    invalidFlag={nameError}
+                    invalidText="이름을 입력해 주세요."
+                    maxLength={50}
+                    label="이름"
+                />
+            </View>
+            <View style={styles.buttonContainer}>
+                <CustomButton
+                    onPress={onSubmitPressed}
+                    text="임시 비밀번호 발급"
+                />
+            </View>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: '40%',
-        marginLeft: '9%',
-        marginRight: '9%',
+        marginLeft: '10%',
+        marginRight: '10%',
+        marginTop: '10%',
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+    },
+    inputContainer: {
+        marginTop: '20%',
+        marginBottom: '30%',
     },
     text: {
-        fontSize: 20,
+        fontSize: 25,
         fontWeight: '500',
         lineHeight: 29.3,
+        marginBottom: '8%',
+        alignSelf: 'center',
     },
-    smallText: {
-        fontSize: 12,
-        fontWeight: '300',
-        marginTop: 5,
-        marginBottom: 50,
+    smallText: { fontSize: 13, color: '#949494', textAlign: 'center' },
+    buttonContainer: {
+        marginBottom: '20%',
     },
 });
 

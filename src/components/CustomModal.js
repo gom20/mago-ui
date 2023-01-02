@@ -1,75 +1,62 @@
-import React, { useState } from "react";
-import { Alert, Modal, StyleSheet, Text, Pressable, View } from "react-native";
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Modal from 'react-native-modal';
+import { useDispatch, useSelector } from 'react-redux';
+import { clearMessage } from '../features/auth/messageSlice';
 
-const CustomModal = ({visible}) => {
-    const [modalVisible, setModalVisible] = useState(false);
-    setModalVisible(visible)
-    
+const CustomModal = () => {
+    const dispatch = useDispatch();
+    const message = useSelector((state) => state.message.message);
+    const closeModal = () => {
+        dispatch(clearMessage());
+    };
     return (
-        <View style={styles.centeredView}>
-            {/* <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-            >
-                <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
-                        <Text style={styles.modalText}>Hello World!</Text>
-                        <Pressable
-                            style={[styles.button, styles.buttonClose]}
-                            onPress={() => setModalVisible(!modalVisible)}
-                        >
-                            <Text style={styles.textStyle}>Close</Text>
-                        </Pressable>
-                    </View>
-                </View>
-            </Modal> */}
-        </View>
+        <Modal isVisible={message ? true : false} style={styles.container}>
+            <View style={styles.modalContent}>
+                <Text style={styles.contentText}>{message}</Text>
+                <View style={styles.line}></View>
+                <TouchableOpacity
+                    onPress={closeModal}
+                    activeOpacity={0.8}
+                    style={{ alignSelf: 'stretch' }}
+                >
+                    <Text style={styles.buttonText}>확인</Text>
+                </TouchableOpacity>
+            </View>
+        </Modal>
     );
 };
 
 const styles = StyleSheet.create({
-    centeredView: {
+    container: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 22
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    modalView: {
-        margin: 20,
-        backgroundColor: "white",
-        borderRadius: 20,
-        padding: 35,
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5
+    modalContent: {
+        backgroundColor: 'white',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: 280,
+        borderRadius: 10,
+        borderColor: '#FFFFFF',
     },
-    button: {
-        borderRadius: 20,
-        padding: 10,
-        elevation: 2
+    contentText: {
+        marginTop: 10,
+        marginBottom: 10,
+        padding: 20,
     },
-    buttonOpen: {
-        backgroundColor: "#F194FF",
+    line: {
+        alignSelf: 'stretch',
+        borderTopColor: '#EEEEEE',
+        borderTopWidth: 1,
     },
-    buttonClose: {
-        backgroundColor: "#2196F3",
+    buttonText: {
+        marginTop: 13,
+        marginBottom: 13,
+        color: '#0DD36E',
+        textAlign: 'center',
     },
-    textStyle: {
-        color: "white",
-        fontWeight: "bold",
-        textAlign: "center"
-    },
-    modalText: {
-        marginBottom: 15,
-        textAlign: "center"
-    }
 });
 
 export default CustomModal;

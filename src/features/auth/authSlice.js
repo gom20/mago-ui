@@ -1,23 +1,28 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import authAPI from './authAPI';
+import { Buffer } from 'buffer';
 
 export const signup = createAsyncThunk(
     'auth/signup',
     async (request, thunkAPI) => {
         try {
-            const response = await authAPI.signup(request);
-            return response;
+            return await authAPI.signup(request);
         } catch (error) {
             return thunkAPI.rejectWithValue();
         }
     }
 );
 
+const parseJwt = (token) => {
+    return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+};
+
 export const login = createAsyncThunk(
     'auth/login',
     async (request, thunkAPI) => {
         try {
             const response = await authAPI.login(request);
+            response.data.tokenExp = parseJwt(response.data.accessToken).exp;
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue();
@@ -29,7 +34,30 @@ export const sendPassword = createAsyncThunk(
     'auth/sendPassword',
     async (request, thunkAPI) => {
         try {
-            const response = await authAPI.sendPassword(request);
+            return await authAPI.sendPassword(request);
+        } catch (error) {
+            return thunkAPI.rejectWithValue();
+        }
+    }
+);
+
+export const logout = createAsyncThunk(
+    'auth/logout',
+    async (request, thunkAPI) => {
+        try {
+            return await authAPI.logout(request);
+        } catch (error) {
+            return thunkAPI.rejectWithValue();
+        }
+    }
+);
+
+export const refreshToken = createAsyncThunk(
+    'auth/refreshToken',
+    async (request, thunkAPI) => {
+        try {
+            const response = await authAPI.refreshToken(request);
+            response.data.tokenExp = parseJwt(response.data.accessToken).exp;
             return response;
         } catch (error) {
             return thunkAPI.rejectWithValue();
@@ -37,19 +65,17 @@ export const sendPassword = createAsyncThunk(
     }
 );
 
-const initialState = { isLogged: false, token: null, user: null };
+const initialState = {
+    isLogged: false,
+    accessToken: null,
+    refreshToken: null,
+    tokenExp: null,
+    user: null,
+};
 
 const authSlice = createSlice({
     name: 'auth',
     initialState,
-    reducers: {
-        logout(state) {
-            console.error('TEST');
-            state.isLogged = false;
-            state.token = null;
-            state.user = null;
-        },
-    },
     extraReducers: (builder) => {
         builder
             .addCase(signup.fulfilled, (state, action) => {
@@ -60,17 +86,44 @@ const authSlice = createSlice({
             })
             .addCase(login.fulfilled, (state, action) => {
                 state.isLogged = true;
-                state.token = action.payload.data.token;
+                state.accessToken = action.payload.data.accessToken;
+                state.refreshToken = action.payload.data.refreshToken;
+                state.tokenExp = action.payload.data.tokenExp;
                 state.user = action.payload.data.user;
             })
             .addCase(login.rejected, (state, action) => {
                 state.isLogged = false;
-                state.token = null;
+                state.accessToken = null;
+                state.refreshToken = null;
+                state.tokenExp = null;
                 state.user = null;
+            })
+            .addCase(logout.fulfilled, (state, action) => {
+                state.isLogged = false;
+                state.accessToken = null;
+                state.refreshToken = null;
+                state.tokenExp = null;
+                state.user = null;
+            })
+            .addCase(logout.rejected, (state, action) => {
+                state.isLogged = false;
+                state.accessToken = null;
+                state.refreshToken = null;
+                state.tokenExp = null;
+                state.user = null;
+            })
+            .addCase(refreshToken.fulfilled, (state, action) => {
+                state.accessToken = action.payload.data.accessToken;
+                state.refreshToken = action.payload.data.refreshToken;
+                state.tokenExp = action.payload.data.tokenExp;
+            })
+            .addCase(refreshToken.rejected, (state, action) => {
+                state.accessToken = null;
+                state.refreshToken = null;
+                state.tokenExp = null;
             })
             .addDefaultCase((state, action) => {});
     },
 });
 
-export const { logout } = authSlice.actions;
 export default authSlice.reducer;

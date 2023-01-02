@@ -38,62 +38,39 @@ const LoginScreen = () => {
             .catch((error) => {});
     };
 
-    const onSignUpPressed = async (data) => {
-        navigation.navigate('SignUp');
-    };
-
-    const onSocialLoginPressed = () => {
-        alert('onSocialLoginPressed');
-    };
-
-    const onPwResetPressed = () => {
+    const onPasswordResetPressed = () => {
         navigation.navigate('PasswordReset');
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>안녕하세요,</Text>
-            <Text style={styles.text}>MAGO 입니다.</Text>
-            <Text style={styles.smallText}>
-                서비스 이용을 위해 로그인 해주세요.
-            </Text>
-
-            <CustomInput
-                value={email}
-                setValue={setEmail}
-                placeholder="이메일"
-                invalidFlag={emailError}
-                invalidText="이메일을 입력해 주세요."
-                maxLength={50}
-            />
-            <CustomInput
-                value={password}
-                setValue={setPassword}
-                placeholder="비밀번호"
-                invalidFlag={passwordError}
-                invalidText="비밀번호를 입력해 주세요."
-                secureTextEntry
-                maxLength={50}
-            />
-            <CustomButton onPress={onLoginPressed} text="로그인" />
-
-            <View style={styles.line} />
-
-            <Pressable onPress={onSocialLoginPressed}>
-                <Image
-                    style={styles.image}
-                    source={require('../../assets/images/kakao_login_medium_wide.png')}
+            <Text style={styles.text}>이메일로 로그인</Text>
+            <View style={styles.inputContainer}>
+                <CustomInput
+                    value={email}
+                    setValue={setEmail}
+                    placeholder="이메일"
+                    invalidFlag={emailError}
+                    invalidText="이메일을 입력해 주세요."
+                    maxLength={50}
+                    label="이메일"
                 />
-            </Pressable>
-
-            <View style={styles.otherButtonContainer}>
-                <Pressable onPress={onPwResetPressed}>
-                    <Text style={styles.otherButtonText}>비밀번호 재설정 </Text>
+                <CustomInput
+                    value={password}
+                    setValue={setPassword}
+                    placeholder="비밀번호"
+                    invalidFlag={passwordError}
+                    invalidText="비밀번호를 입력해 주세요."
+                    secureTextEntry
+                    maxLength={50}
+                    label="비밀번호"
+                />
+                <Pressable onPress={onPasswordResetPressed}>
+                    <Text style={styles.smallText}>비밀번호를 잊으셨나요?</Text>
                 </Pressable>
-                <Text style={styles.otherButtonText}>|</Text>
-                <Pressable onPress={onSignUpPressed}>
-                    <Text style={styles.otherButtonText}> 회원가입 하기</Text>
-                </Pressable>
+            </View>
+            <View style={styles.buttonContainer}>
+                <CustomButton onPress={onLoginPressed} text="로그인" />
             </View>
         </View>
     );
@@ -101,41 +78,27 @@ const LoginScreen = () => {
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: '40%',
-        marginLeft: '9%',
-        marginRight: '9%',
+        marginLeft: '10%',
+        marginRight: '10%',
+        marginTop: '10%',
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-between',
     },
-    inputContainer: {},
+    inputContainer: {
+        marginTop: '20%',
+        marginBottom: '30%',
+    },
     text: {
         fontSize: 25,
         fontWeight: '500',
-
         lineHeight: 29.3,
+        marginBottom: '8%',
+        alignSelf: 'center',
     },
-    smallText: {
-        fontSize: 12,
-        fontWeight: '300',
-        marginTop: 5,
-        marginBottom: 50,
-    },
-    line: {
-        borderBottomColor: 'gray',
-        borderBottomWidth: 1,
-        marginTop: '5%',
-        marginBottom: '5%',
-    },
-    image: {
-        width: '100%',
-    },
-    otherButtonContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        marginTop: 15,
-    },
-    otherButtonText: {
-        fontWeight: '500',
-        fontSize: 12,
+    smallText: { fontSize: 13, color: '#949494', textAlign: 'right' },
+    buttonContainer: {
+        marginBottom: '20%',
     },
 });
 

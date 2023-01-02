@@ -1,6 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import { useDispatch } from 'react-redux';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
@@ -65,79 +66,80 @@ const SignUpScreen = () => {
         )
             .unwrap()
             .then((response) => {
-                navigation.navigate('SignIn');
+                navigation.navigate('SignUpSuccess');
             })
             .catch((error) => {});
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.text}>회원가입</Text>
-            <CustomInput
-                label="이메일"
-                value={email}
-                setValue={setEmail}
-                placeholder="이메일"
-                invalidFlag={emailError}
-                invalidText="이메일을 입력해 주세요."
-                maxLength={50}
-            />
-            <CustomInput
-                label="이름"
-                value={name}
-                setValue={setName}
-                placeholder="이름"
-                invalidFlag={nameError}
-                invalidText="이름을 입력해 주세요."
-                maxLength={50}
-            />
-            <CustomInput
-                label="비밀번호"
-                value={password}
-                setValue={setPassword}
-                placeholder="영문자, 숫자 포함 최소 8~20자"
-                secureTextEntry={true}
-                invalidFlag={passwordError}
-                invalidText="영문자, 숫자 조합으로 8자 이상 입력해주세요."
-                maxLength={20}
-            />
-            <CustomInput
-                label="비밀번호 확인"
-                value={confirmPassword}
-                setValue={setConfirmPassword}
-                placeholder="비밀번호 확인"
-                secureTextEntry={true}
-                invalidFlag={confirmPasswordError}
-                invalidText="입력하신 비밀번호와 다릅니다."
-                maxLength={20}
-            />
-            <View style={{ marginTop: '5%' }}></View>
-            <CustomButton onPress={onSignUpPressed} text="회원가입" />
-        </View>
+        <KeyboardAwareScrollView
+            contentContainerStyle={styles.container}
+            resetScrollToCoords={{ x: 0, y: 0 }}
+            scrollEnabled={false}
+        >
+            <View>
+                <Text style={styles.text}>회원가입</Text>
+                <CustomInput
+                    label="이메일"
+                    value={email}
+                    setValue={setEmail}
+                    placeholder="이메일"
+                    invalidFlag={emailError}
+                    invalidText="이메일을 입력해 주세요."
+                    maxLength={50}
+                />
+                <CustomInput
+                    label="이름"
+                    value={name}
+                    setValue={setName}
+                    placeholder="이름"
+                    invalidFlag={nameError}
+                    invalidText="이름을 입력해 주세요."
+                    maxLength={50}
+                />
+                <CustomInput
+                    label="비밀번호"
+                    value={password}
+                    setValue={setPassword}
+                    placeholder="영문자, 숫자 포함 최소 8~20자"
+                    secureTextEntry={true}
+                    invalidFlag={passwordError}
+                    invalidText="영문자, 숫자 조합으로 8자 이상 입력해주세요."
+                    maxLength={20}
+                />
+                <CustomInput
+                    label="비밀번호 확인"
+                    value={confirmPassword}
+                    setValue={setConfirmPassword}
+                    placeholder="비밀번호 확인"
+                    secureTextEntry={true}
+                    invalidFlag={confirmPasswordError}
+                    invalidText="입력하신 비밀번호와 다릅니다."
+                    maxLength={20}
+                />
+                <View style={{ marginTop: '20%' }}></View>
+                <CustomButton
+                    style={styles.button}
+                    onPress={onSignUpPressed}
+                    text="회원가입"
+                />
+            </View>
+        </KeyboardAwareScrollView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: '30%',
-        marginLeft: '9%',
-        marginRight: '9%',
+        marginLeft: '10%',
+        marginRight: '10%',
+        marginTop: '10%',
     },
-
     text: {
         fontSize: 25,
         fontWeight: '500',
         lineHeight: 29.3,
         marginBottom: '8%',
-    },
-    label: {
-        marginTop: '1%',
-        fontSize: 14,
-        lineHeight: 29.3,
-    },
-    invalid: {
-        fontSize: 11,
-        color: 'blue',
+        alignSelf: 'center',
     },
 });
 
