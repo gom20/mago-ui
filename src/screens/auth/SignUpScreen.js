@@ -5,7 +5,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview'
 import { useDispatch } from 'react-redux';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
-import { signup } from './authSlice';
+import { signup } from '../../slices/authSlice';
 
 const SignUpScreen = () => {
     const [email, setEmail] = useState('');

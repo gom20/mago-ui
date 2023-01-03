@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import authAPI from './authAPI';
+import authAPI from '../services/authAPI';
 import { Buffer } from 'buffer';
 
 export const signup = createAsyncThunk(
@@ -45,7 +45,8 @@ export const logout = createAsyncThunk(
     'auth/logout',
     async (request, thunkAPI) => {
         try {
-            return await authAPI.logout(request);
+            const { accessToken, refreshToken } = thunkAPI.getState().auth;
+            return await authAPI.logout({ accessToken, refreshToken });
         } catch (error) {
             return thunkAPI.rejectWithValue();
         }

@@ -1,49 +1,50 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
-import { sendPassword } from './authSlice';
+import { login } from '../../slices/authSlice';
 
-const PwResetScreen = () => {
+const LoginScreen = () => {
     const [email, setEmail] = useState('');
-    const [name, setName] = useState('');
+    const [password, setPassword] = useState('');
     const [emailError, setEmailError] = useState(false);
-    const [nameError, setNameError] = useState(false);
+    const [passwordError, setPasswordError] = useState(false);
 
     const dispatch = useDispatch();
     const navigation = useNavigation();
 
-    const onSubmitPressed = () => {
+    const onLoginPressed = async () => {
         const _validateInputs = () => {
             email ? setEmailError(false) : setEmailError(true);
-            name ? setNameError(false) : setNameError(true);
-            return email && name ? true : false;
+            password ? setPasswordError(false) : setPasswordError(true);
+            return email && password ? true : false;
         };
-        if (!_validateInputs()) return;
 
+        if (!_validateInputs()) return;
         dispatch(
-            sendPassword({
+            login({
                 email: email,
-                name: name,
+                password: password,
             })
         )
             .unwrap()
             .then((response) => {
-                navigation.navigate('SignIn');
+                console.error(response);
+                navigation.navigate('MainTab');
             })
             .catch((error) => {});
     };
 
+    const onPasswordResetPressed = () => {
+        navigation.navigate('PasswordReset');
+    };
+
     return (
         <View style={styles.container}>
-            <View>
-                <Text style={styles.text}>비밀번호 재설정</Text>
-                <Text style={styles.smallText}>
-                    회원가입 시 작성한 이메일과 이름을 입력해주세요.
-                </Text>
-            </View>
+            <Text style={styles.text}>이메일로 로그인</Text>
             <View style={styles.inputContainer}>
                 <CustomInput
                     value={email}
@@ -55,20 +56,21 @@ const PwResetScreen = () => {
                     label="이메일"
                 />
                 <CustomInput
-                    value={name}
-                    setValue={setName}
-                    placeholder="이름"
-                    invalidFlag={nameError}
-                    invalidText="이름을 입력해 주세요."
+                    value={password}
+                    setValue={setPassword}
+                    placeholder="비밀번호"
+                    invalidFlag={passwordError}
+                    invalidText="비밀번호를 입력해 주세요."
+                    secureTextEntry
                     maxLength={50}
-                    label="이름"
+                    label="비밀번호"
                 />
+                <Pressable onPress={onPasswordResetPressed}>
+                    <Text style={styles.smallText}>비밀번호를 잊으셨나요?</Text>
+                </Pressable>
             </View>
             <View style={styles.buttonContainer}>
-                <CustomButton
-                    onPress={onSubmitPressed}
-                    text="임시 비밀번호 발급"
-                />
+                <CustomButton onPress={onLoginPressed} text="로그인" />
             </View>
         </View>
     );
@@ -94,10 +96,10 @@ const styles = StyleSheet.create({
         marginBottom: '8%',
         alignSelf: 'center',
     },
-    smallText: { fontSize: 13, color: '#949494', textAlign: 'center' },
+    smallText: { fontSize: 13, color: '#949494', textAlign: 'right' },
     buttonContainer: {
         marginBottom: '20%',
     },
 });
 
-export default PwResetScreen;
+export default LoginScreen;

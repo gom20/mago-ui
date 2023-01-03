@@ -1,6 +1,6 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import authReducer from './features/auth/authSlice';
-import messageReducer from './features/auth/messageSlice';
+import authReducer from './slices/authSlice';
+import messageReducer from './slices/messageSlice';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { persistReducer, persistStore } from 'redux-persist';

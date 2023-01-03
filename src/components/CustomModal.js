@@ -1,27 +1,49 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
-import { useDispatch, useSelector } from 'react-redux';
-import { clearMessage } from '../features/auth/messageSlice';
+import { ModalContext } from '../utils/ModalContext';
 
-const CustomModal = () => {
-    const dispatch = useDispatch();
-    const message = useSelector((state) => state.message.message);
-    const closeModal = () => {
-        dispatch(clearMessage());
-    };
+const CustomModal = ({}) => {
+    let { modalProps, showModal, hideModal } = useContext(ModalContext);
+
     return (
-        <Modal isVisible={message ? true : false} style={styles.container}>
+        <Modal isVisible={modalProps.visible} style={styles.container}>
             <View style={styles.modalContent}>
-                <Text style={styles.contentText}>{message}</Text>
+                <Text style={styles.contentText}>{modalProps.message}</Text>
                 <View style={styles.line}></View>
-                <TouchableOpacity
-                    onPress={closeModal}
-                    activeOpacity={0.8}
-                    style={{ alignSelf: 'stretch' }}
-                >
-                    <Text style={styles.buttonText}>확인</Text>
-                </TouchableOpacity>
+                {modalProps.type == 'alert' && (
+                    <TouchableOpacity
+                        onPress={() => hideModal(true)}
+                        activeOpacity={0.8}
+                        style={{ alignSelf: 'stretch' }}
+                    >
+                        <Text style={styles.buttonText}>
+                            {modalProps.buttonTexts[0]}
+                        </Text>
+                    </TouchableOpacity>
+                )}
+                {modalProps.type == 'confirm' && (
+                    <View style={styles.buttonContianer}>
+                        <TouchableOpacity
+                            onPress={() => hideModal(true)}
+                            activeOpacity={0.8}
+                            style={styles.button}
+                        >
+                            <Text style={styles.buttonText}>
+                                {modalProps.buttonTexts[0]}
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => hideModal(false)}
+                            activeOpacity={0.8}
+                            style={styles.button}
+                        >
+                            <Text style={styles.buttonText}>
+                                {modalProps.buttonTexts[1]}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             </View>
         </Modal>
     );
@@ -50,6 +72,11 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch',
         borderTopColor: '#EEEEEE',
         borderTopWidth: 1,
+    },
+    buttonContianer: {
+        alignSelf: 'stretch',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
     },
     buttonText: {
         marginTop: 13,

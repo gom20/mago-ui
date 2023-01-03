@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
+import React, { useContext } from 'react';
 import {
     Image,
     ImageBackground,
@@ -9,8 +9,10 @@ import {
     View,
 } from 'react-native';
 import CustomButton from '../../components/CustomButton';
+import { ModalContext } from '../../utils/ModalContext';
 
 const OnboardScreen = () => {
+    const { showModal } = useContext(ModalContext);
     const navigation = useNavigation();
 
     const onLoginPressed = () => {
@@ -21,10 +23,7 @@ const OnboardScreen = () => {
         navigation.navigate('SignUp');
     };
 
-    const onSocialLoginPressed = () => {
-        navigation.navigate('SignUpSuccess');
-        // alert('SignUpSuccess');
-    };
+    const onSocialLoginPressed = async () => {};
 
     return (
         <View style={styles.container}>
@@ -36,7 +35,6 @@ const OnboardScreen = () => {
                 <View style={styles.logoContainer}>
                     <Image
                         source={require('../../assets/images/mago_logo_white.png')}
-                        style={styles.logo}
                     ></Image>
                     <Text style={styles.text}> 나의 산을 기록하다</Text>
                     <Text style={styles.text}> 마운틴고 </Text>

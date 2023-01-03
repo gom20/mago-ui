@@ -1,50 +1,54 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useContext, useState } from 'react';
+import { StyleSheet, View, Text } from 'react-native';
+import { useDispatch } from 'react-redux';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
-import { login } from './authSlice';
+import { sendPassword } from '../../slices/authSlice';
+import { ModalContext } from '../../utils/ModalContext';
 
-const LoginScreen = () => {
+const PwResetScreen = () => {
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
     const [emailError, setEmailError] = useState(false);
-    const [passwordError, setPasswordError] = useState(false);
+    const [nameError, setNameError] = useState(false);
 
+    const { showModal } = useContext(ModalContext);
     const dispatch = useDispatch();
     const navigation = useNavigation();
 
-    const onLoginPressed = async () => {
+    const onSubmitPressed = () => {
         const _validateInputs = () => {
             email ? setEmailError(false) : setEmailError(true);
-            password ? setPasswordError(false) : setPasswordError(true);
-            return email && password ? true : false;
+            name ? setNameError(false) : setNameError(true);
+            return email && name ? true : false;
         };
-
         if (!_validateInputs()) return;
+
         dispatch(
-            login({
+            sendPassword({
                 email: email,
-                password: password,
+                name: name,
             })
         )
             .unwrap()
-            .then((response) => {
-                console.error(response);
-                navigation.navigate('AppTabComponent');
+            .then(async (response) => {
+                await showModal({
+                    message: '입력하신 이메일로 임시비밀번호가 전송되었습니다.',
+                });
+                navigation.navigate('Login');
             })
             .catch((error) => {});
     };
 
-    const onPasswordResetPressed = () => {
-        navigation.navigate('PasswordReset');
-    };
-
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>이메일로 로그인</Text>
+            <View>
+                <Text style={styles.text}>비밀번호 재설정</Text>
+                <Text style={styles.smallText}>
+                    회원가입 시 작성한 이메일과 이름을 입력해주세요.
+                </Text>
+            </View>
             <View style={styles.inputContainer}>
                 <CustomInput
                     value={email}
@@ -56,21 +60,20 @@ const LoginScreen = () => {
                     label="이메일"
                 />
                 <CustomInput
-                    value={password}
-                    setValue={setPassword}
-                    placeholder="비밀번호"
-                    invalidFlag={passwordError}
-                    invalidText="비밀번호를 입력해 주세요."
-                    secureTextEntry
+                    value={name}
+                    setValue={setName}
+                    placeholder="이름"
+                    invalidFlag={nameError}
+                    invalidText="이름을 입력해 주세요."
                     maxLength={50}
-                    label="비밀번호"
+                    label="이름"
                 />
-                <Pressable onPress={onPasswordResetPressed}>
-                    <Text style={styles.smallText}>비밀번호를 잊으셨나요?</Text>
-                </Pressable>
             </View>
             <View style={styles.buttonContainer}>
-                <CustomButton onPress={onLoginPressed} text="로그인" />
+                <CustomButton
+                    onPress={onSubmitPressed}
+                    text="임시 비밀번호 발급"
+                />
             </View>
         </View>
     );
@@ -96,10 +99,10 @@ const styles = StyleSheet.create({
         marginBottom: '8%',
         alignSelf: 'center',
     },
-    smallText: { fontSize: 13, color: '#949494', textAlign: 'right' },
+    smallText: { fontSize: 13, color: '#949494', textAlign: 'center' },
     buttonContainer: {
         marginBottom: '20%',
     },
 });
 
-export default LoginScreen;
+export default PwResetScreen;

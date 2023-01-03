@@ -2,17 +2,25 @@ import { MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-const CustomButton = ({ onPress, text, iconType, bgColor, textColor }) => {
-    const getTextColor = () => {
+const CustomButton = ({
+    onPress,
+    text,
+    iconType,
+    bgColor,
+    textColor,
+    height,
+    fontSize,
+}) => {
+    const getTextStyle = () => {
         const style = {};
-        if (textColor) style.color = textColor;
-        else style.color = '#FFFFFF';
+        style.color = textColor ? textColor : '#FFFFFF';
+        style.fontSize = fontSize ? fontSize : 15;
         return style;
     };
-    const getBackgroundColor = () => {
+    const getButtonStyle = () => {
         const style = {};
-        if (bgColor) style.backgroundColor = bgColor;
-        else style.backgroundColor = '#0DD36E';
+        style.backgroundColor = bgColor ? bgColor : '#0DD36E';
+        style.height = height ? height : 45;
         return style;
     };
 
@@ -20,17 +28,17 @@ const CustomButton = ({ onPress, text, iconType, bgColor, textColor }) => {
         <TouchableOpacity
             activeOpacity={0.8}
             onPress={onPress}
-            style={[styles.defaultContainer, getBackgroundColor()]}
+            style={[styles.defaultContainer, getButtonStyle()]}
         >
             {iconType && (
                 <MaterialIcons
                     name={iconType}
                     size={20}
-                    color={getTextColor().color}
+                    color={getTextStyle().color}
                     style={styles.icon}
                 ></MaterialIcons>
             )}
-            <Text style={[styles.defaultText, getTextColor()]}>{text}</Text>
+            <Text style={[styles.defaultText, getTextStyle()]}>{text}</Text>
         </TouchableOpacity>
     );
 };
@@ -38,7 +46,7 @@ const CustomButton = ({ onPress, text, iconType, bgColor, textColor }) => {
 const styles = StyleSheet.create({
     defaultContainer: {
         width: '100%',
-        height: 45,
+        // height: 45,
         alignItems: 'center',
         marginBottom: 11,
         borderRadius: 5,
@@ -46,9 +54,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderRadius: 20,
         flexDirection: 'row',
-    },
-    defaultText: {
-        fontSize: 15,
     },
     icon: {
         marginRight: 8,

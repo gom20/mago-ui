@@ -24,7 +24,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
     }
 });
 
-export default function GpsScreen() {
+export default function TestScreen() {
     // Define position state: {latitude: number, longitude: number}
     const [position, setPosition] = useState(null);
     const navigation = useNavigation();

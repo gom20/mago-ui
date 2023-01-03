@@ -1,17 +1,17 @@
 import { NavigationContainer } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { useDispatch } from 'react-redux';
-import api from './base/api';
-import CustomModal from './components/CustomModal';
 import LoadingIndicator from './components/LoadingIndicator';
-import { setMessage } from './features/auth/messageSlice';
 import AppStack from './navigations/AppStack';
+import api from './services/api';
 import { store } from './store';
+import { ModalContext } from './utils/ModalContext';
 
 export default function AppLayout() {
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
+    const { showModal } = useContext(ModalContext);
 
     useEffect(() => {
         api.interceptors.request.use(
@@ -67,8 +67,7 @@ export default function AppLayout() {
                         error.response.data.message
                             ? error.response.data.message
                             : error.message || error.toString();
-                    // alert(errorMsg);
-                    dispatch(setMessage(errorMsg));
+                    showModal({ message: errorMsg });
                 }
                 return Promise.reject(error.resposne || error);
             }
@@ -81,7 +80,6 @@ export default function AppLayout() {
                 <AppStack />
             </NavigationContainer>
             <LoadingIndicator loading={loading} />
-            <CustomModal />
         </>
     );
 }

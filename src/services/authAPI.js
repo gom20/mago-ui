@@ -1,5 +1,4 @@
-import api from '../../base/api';
-import { AsyncAlert } from '../../utils/AsyncAlert';
+import api from './api';
 
 const signup = (request) => {
     return api.post('auth/signup', request).then((response) => {
@@ -15,15 +14,13 @@ const login = (request) => {
 
 const logout = (request) => {
     return api.post('auth/logout', request).then(async (response) => {
-        await AsyncAlert('Alert', '로그아웃 되었습니다.');
-        return response;
+        response;
     });
 };
 
 const sendPassword = (request) => {
     return api.post('auth/sendPassword', request).then(async (response) => {
-        await AsyncAlert('Alert', '임시 비밀번호가 전송되었습니다.');
-        return response;
+        response;
     });
 };
 

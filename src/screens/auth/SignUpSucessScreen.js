@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
-import { signup } from './authSlice';
+import { signup } from '../../slices/authSlice';
 
 const SignUpSuccessScreen = () => {
     const dispatch = useDispatch();
