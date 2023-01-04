@@ -8,6 +8,7 @@ const CustomButton = ({
     iconType,
     bgColor,
     textColor,
+    width,
     height,
     fontSize,
 }) => {
@@ -21,6 +22,7 @@ const CustomButton = ({
         const style = {};
         style.backgroundColor = bgColor ? bgColor : '#0DD36E';
         style.height = height ? height : 45;
+        style.width = width ? width : '100%';
         return style;
     };
 
@@ -45,7 +47,7 @@ const CustomButton = ({
 
 const styles = StyleSheet.create({
     defaultContainer: {
-        width: '100%',
+        // width: '100%',
         // height: 45,
         alignItems: 'center',
         marginBottom: 11,

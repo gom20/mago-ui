@@ -2,13 +2,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import HikingScreen from '../screens/hiking/HikingScreen';
 import HomeScreen from '../screens/hiking/HomeScreens';
+import MainTab from './MainTab';
 
 const Stack = createStackNavigator();
 
 const HomeStack = () => {
     return (
         <Stack.Navigator
-            initialRouteName="Home"
+            initialRouteName="MainTab"
             screenOptions={{
                 headerTitle: '',
                 headerStyle: { elevation: 0 },
@@ -16,14 +17,14 @@ const HomeStack = () => {
             }}
         >
             <Stack.Screen
-                name="Home"
-                component={HomeScreen}
+                name="MainTab"
+                component={MainTab}
                 options={{ headerShown: false }}
             />
             <Stack.Screen
                 name="Hiking"
                 component={HikingScreen}
-                options={{ headerShown: true }}
+                options={{ headerShown: true, headerTransparent: true }}
             />
         </Stack.Navigator>
     );

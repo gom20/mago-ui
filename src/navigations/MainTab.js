@@ -2,6 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import DiaryScreen from '../screens/feed/FeedListScreen';
+import HomeScreen from '../screens/hiking/HomeScreens';
 import HomeStack from './HomeStack';
 
 const Tab = createBottomTabNavigator();
@@ -11,6 +12,8 @@ const MainTab = () => {
         <Tab.Navigator
             screenOptions={({ route }) => ({
                 headerShown: false,
+                // tabBarAtiveTintColor: '#0DD36E',
+                // tabBarInactiveTintColor: '#949494',
                 tabBarStyle: {
                     backgroundColor: '#FBFBFB',
                 },
@@ -41,7 +44,7 @@ const MainTab = () => {
                 inactiveTintColor: '#949494',
             }}
         >
-            <Tab.Screen name="홈" component={HomeStack} />
+            <Tab.Screen name="홈" component={HomeScreen} />
             <Tab.Screen name="나의 산 기록" component={DiaryScreen} />
             <Tab.Screen name="주변 산 목록" component={DiaryScreen} />
             <Tab.Screen name="도전 100대 명산" component={DiaryScreen} />

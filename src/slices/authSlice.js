@@ -25,6 +25,7 @@ export const login = createAsyncThunk(
             response.data.tokenExp = parseJwt(response.data.accessToken).exp;
             return response;
         } catch (error) {
+            console.error(error);
             return thunkAPI.rejectWithValue();
         }
     }

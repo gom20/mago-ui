@@ -9,12 +9,14 @@ import SignUpSuccessScreen from '../screens/auth/SignUpSucessScreen';
 import { Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import MainTab from './MainTab';
+import HomeScreen from '../screens/hiking/HomeScreens';
+import HomeStack from './HomeStack';
 
 const Stack = createStackNavigator();
 
 const AppStack = () => {
     const auth = useSelector((state) => state.auth);
-    const initScreen = auth.isLogged ? 'MainTab' : 'Onboard';
+    const initScreen = auth.isLogged ? 'Home' : 'Onboard';
 
     return (
         <Stack.Navigator
@@ -51,8 +53,8 @@ const AppStack = () => {
                 options={{ headerShown: true }}
             />
             <Stack.Screen
-                name="MainTab"
-                component={MainTab}
+                name="Home"
+                component={HomeStack}
                 options={{ headerShown: false }}
             />
         </Stack.Navigator>

@@ -5,18 +5,19 @@ import { useDispatch } from 'react-redux';
 import LoadingIndicator from './components/LoadingIndicator';
 import AppStack from './navigations/AppStack';
 import api from './services/api';
+import { hideLoading, showLoading } from './slices/loadingSlice';
 import { store } from './store';
 import { ModalContext } from './utils/ModalContext';
 
 export default function AppLayout() {
-    const [loading, setLoading] = useState(false);
+    // const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
     const { showModal } = useContext(ModalContext);
 
     useEffect(() => {
         api.interceptors.request.use(
             async function (config) {
-                setLoading(true);
+                dispatch(showLoading());
                 const accessToken = store.getState().auth.accessToken;
                 if (accessToken) {
                     config.headers.Authorization = accessToken;
@@ -31,7 +32,7 @@ export default function AppLayout() {
 
         api.interceptors.response.use(
             function (response) {
-                setLoading(false);
+                dispatch(hideLoading());
                 return response.data;
             },
             async function (error) {
@@ -60,7 +61,7 @@ export default function AppLayout() {
                     // }
                     // return axios(originalRequest);
                 } else {
-                    setLoading(false);
+                    dispatch(hideLoading());
                     const errorMsg =
                         error.response &&
                         error.response.data &&
@@ -79,7 +80,7 @@ export default function AppLayout() {
             <NavigationContainer>
                 <AppStack />
             </NavigationContainer>
-            <LoadingIndicator loading={loading} />
+            <LoadingIndicator />
         </>
     );
 }

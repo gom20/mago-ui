@@ -32,7 +32,6 @@ const LoginScreen = () => {
         )
             .unwrap()
             .then((response) => {
-                console.error(response);
                 navigation.navigate('MainTab');
             })
             .catch((error) => {});
