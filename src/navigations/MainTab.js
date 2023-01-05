@@ -3,7 +3,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import DiaryScreen from '../screens/feed/FeedListScreen';
 import HomeScreen from '../screens/hiking/HomeScreens';
-import HomeStack from './HomeStack';
 
 const Tab = createBottomTabNavigator();
 
@@ -17,14 +16,13 @@ const MainTab = () => {
                 tabBarStyle: {
                     backgroundColor: '#FBFBFB',
                 },
+                tabBarHideOnKeyboard: true,
                 tabBarIcon: ({ focused, color, size }) => {
                     let iconName;
                     if (route.name === '홈') {
                         iconName = 'home';
                     } else if (route.name === '나의 산 기록') {
                         iconName = 'calendar-check';
-                    } else if (route.name === '주변 산 목록') {
-                        iconName = 'map-marker-radius';
                     } else if (route.name === '도전 100대 명산') {
                         iconName = 'hiking';
                     } else if (route.name === '마이') {
@@ -46,7 +44,6 @@ const MainTab = () => {
         >
             <Tab.Screen name="홈" component={HomeScreen} />
             <Tab.Screen name="나의 산 기록" component={DiaryScreen} />
-            <Tab.Screen name="주변 산 목록" component={DiaryScreen} />
             <Tab.Screen name="도전 100대 명산" component={DiaryScreen} />
             <Tab.Screen name="마이" component={DiaryScreen} />
         </Tab.Navigator>

@@ -1,8 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useDispatch } from 'react-redux';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
 import { login } from '../../slices/authSlice';
@@ -32,7 +31,7 @@ const LoginScreen = () => {
         )
             .unwrap()
             .then((response) => {
-                navigation.navigate('MainTab');
+                navigation.navigate('Home');
             })
             .catch((error) => {});
     };

@@ -11,6 +11,7 @@ const CustomButton = ({
     width,
     height,
     fontSize,
+    disabled = false,
 }) => {
     const getTextStyle = () => {
         const style = {};
@@ -20,7 +21,11 @@ const CustomButton = ({
     };
     const getButtonStyle = () => {
         const style = {};
-        style.backgroundColor = bgColor ? bgColor : '#0DD36E';
+        style.backgroundColor = disabled
+            ? '#DBDBDB'
+            : bgColor
+            ? bgColor
+            : '#0DD36E';
         style.height = height ? height : 45;
         style.width = width ? width : '100%';
         return style;
@@ -28,6 +33,7 @@ const CustomButton = ({
 
     return (
         <TouchableOpacity
+            disabled={disabled}
             activeOpacity={0.8}
             onPress={onPress}
             style={[styles.defaultContainer, getButtonStyle()]}
