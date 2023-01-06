@@ -1,18 +1,26 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { useDispatch } from 'react-redux';
+import React, { useEffect } from 'react';
+import { BackHandler, StyleSheet, Text, View } from 'react-native';
 import CustomButton from '../../components/CustomButton';
-import CustomInput from '../../components/CustomInput';
-import { signup } from '../../slices/authSlice';
 
 const SignUpSuccessScreen = () => {
-    const dispatch = useDispatch();
     const navigation = useNavigation();
 
     const onOnboardPressed = () => {
         navigation.navigate('Onboard');
     };
+
+    useEffect(() => {
+        const backAction = () => {
+            navigation.navigate('Onboard');
+            return true;
+        };
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            backAction
+        );
+        return () => backHandler.remove();
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -42,7 +50,7 @@ const styles = StyleSheet.create({
         marginTop: '50%',
     },
     button: {
-        marginBottom: '20%',
+        marginBottom: '30%',
     },
 });
 

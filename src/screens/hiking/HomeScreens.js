@@ -1,7 +1,8 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import { useDispatch, useSelector } from 'react-redux';
 import CustomButton from '../../components/CustomButton';
 import { logout } from '../../slices/authSlice';
@@ -9,7 +10,7 @@ import mountains from './../../../mountains.json';
 
 const HomeScreen = () => {
     const auth = useSelector((state) => state.auth);
-    const [mountain, setMountain] = useState(null);
+    const [mountain, setMountain] = useState('');
 
     const dispatch = useDispatch();
     const navigation = useNavigation();
@@ -27,22 +28,54 @@ const HomeScreen = () => {
         navigation.navigate('Hiking');
     };
 
+    const scrollViewRef = useRef();
     return (
-        <View style={styles.container}>
-            <View style={styles.logoContainer}>
-                <Image
-                    source={require('../../assets/images/mago_logo_green.png')}
-                    style={styles.logo}
-                ></Image>
-                <Text style={styles.text}>오늘의 산은{'\n'}어디인가요?</Text>
-                <Text style={styles.smallText}>
-                    산을 먼저 선택하세요.{'\n'}오늘도 안전하게 즐겁게 마운틴고!
-                </Text>
+        <KeyboardAwareScrollView
+            contentContainerStyle={styles.container}
+            resetScrollToCoords={{ x: 0, y: 0 }}
+            scrollEnabled={false}
+            innerRef={(ref) => {
+                scrollViewRef = ref;
+            }}
+            keyboardShouldPersistTaps={'handled'}
+        >
+            <View>
+                <View style={styles.logoContainer}>
+                    <Image
+                        source={require('../../assets/images/mago_logo_green.png')}
+                        style={styles.logo}
+                    ></Image>
+                    <Text style={styles.text}>
+                        오늘의 산은{'\n'}어디인가요?
+                    </Text>
+                    <Text style={styles.smallText}>
+                        산을 먼저 찾아보세요.{'\n'}오늘도 안전하게 즐겁게
+                        마운틴고!
+                    </Text>
+                </View>
+
                 <AutocompleteDropdown
+                    onFocus={() => {
+                        // console.error(scrollViewRef);
+                        // scrollViewRef.scrollToEnd({ animated: true });
+                    }}
                     clearOnFocus={false}
                     closeOnBlur={true}
                     closeOnSubmit={false}
-                    onSelectItem={setMountain}
+                    onSelectItem={(item) => {
+                        if (item) {
+                            setMountain(item.title);
+                        }
+                    }}
+                    onChangeText={(text) => {
+                        setMountain(text);
+                    }}
+                    onClear={() => {
+                        setMountain('');
+                    }}
+                    onOpenSuggestionsList={() => {
+                        console.log('dropdownlist');
+                    }}
                     dataSet={mountains.data}
                     textInputProps={{
                         placeholder: '오늘의 산을 검색하세요.',
@@ -70,21 +103,27 @@ const HomeScreen = () => {
                         borderWidth: 1,
                         // width: '80%',
                         alignSelf: 'center',
-                        borderRadius: 25,
+                        // borderRadius: 25,
                     }}
                     inputHeight={45}
+                    containerStyle={{ flexGrow: 1, flexShrink: 1 }}
+                    renderItem={(item, text) => (
+                        <Text style={{ padding: 15 }}>{item.title}</Text>
+                    )}
                 />
+                <View style={styles.buttonContainer}>
+                    <CustomButton
+                        onPress={onHikingPressed}
+                        text="등산하기"
+                        disabled={mountain ? false : true}
+                    />
+                    <CustomButton
+                        onPress={onLogoutPressed}
+                        text="임시 로그아웃"
+                    />
+                </View>
             </View>
-
-            <View style={styles.buttonContainer}>
-                <CustomButton
-                    onPress={onHikingPressed}
-                    text="등산하기"
-                    disabled={mountain ? false : true}
-                />
-                <CustomButton onPress={onLogoutPressed} text="임시 로그아웃" />
-            </View>
-        </View>
+        </KeyboardAwareScrollView>
     );
 };
 
@@ -92,21 +131,20 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#FFFFFF',
-        justifyContent: 'space-between',
+        paddingLeft: '10%',
+        paddingRight: '10%',
     },
     logoContainer: {
         marginTop: '30%',
-        marginLeft: '10%',
-        marginRight: '10%',
+        marginBottom: '60%',
     },
     buttonContainer: {
-        marginBottom: '30%',
-        marginLeft: '10%',
-        marginRight: '10%',
+        marginTop: '20%',
     },
     text: {
         fontSize: 28,
         fontWeight: '300',
+        marginBottom: '3%',
     },
     smallText: {
         color: '#949494',

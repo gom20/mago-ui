@@ -23,6 +23,11 @@ const SignUpScreen = () => {
     const validateInputs = () => {
         let validFlag = true;
 
+        setEmail((email) => email.trim());
+        setName((name) => name.trim());
+        setPassword((password) => password.trim());
+        setConfirmPassword((confirmPassword) => confirmPassword.trim());
+
         const emailRegex =
             /^(([^<>()\[\].,;:\s@"]+(\.[^<>()\[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
         if (email && emailRegex.test(email)) {
@@ -76,6 +81,7 @@ const SignUpScreen = () => {
             contentContainerStyle={styles.container}
             resetScrollToCoords={{ x: 0, y: 0 }}
             scrollEnabled={false}
+            keyboardShouldPersistTaps={'handled'}
         >
             <View>
                 <Text style={styles.text}>회원가입</Text>
@@ -101,7 +107,7 @@ const SignUpScreen = () => {
                     label="비밀번호"
                     value={password}
                     setValue={setPassword}
-                    placeholder="영문자, 숫자 포함 최소 8~20자"
+                    placeholder="영문자, 숫자 조합 8~20자"
                     secureTextEntry={true}
                     invalidFlag={passwordError}
                     invalidText="영문자, 숫자 조합으로 8자 이상 입력해주세요."
@@ -117,7 +123,7 @@ const SignUpScreen = () => {
                     invalidText="입력하신 비밀번호와 다릅니다."
                     maxLength={20}
                 />
-                <View style={{ marginTop: '20%' }}></View>
+                <View style={{ marginTop: '10%' }}></View>
                 <CustomButton
                     style={styles.button}
                     onPress={onSignUpPressed}

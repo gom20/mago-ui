@@ -9,15 +9,15 @@ import { ModalProvider } from './utils/ModalContext';
 
 export default function App() {
     return (
-        <SafeAreaView style={styles.container}>
-            <Provider store={store}>
-                <PersistGate loading={null} persistor={persistor}>
-                    <ModalProvider>
-                        <AppLayout />
-                    </ModalProvider>
-                </PersistGate>
-            </Provider>
-        </SafeAreaView>
+        // <SafeAreaView style={styles.container}>
+        <Provider store={store}>
+            <PersistGate loading={null} persistor={persistor}>
+                <ModalProvider>
+                    <AppLayout />
+                </ModalProvider>
+            </PersistGate>
+        </Provider>
+        // </SafeAreaView>
     );
 }
 

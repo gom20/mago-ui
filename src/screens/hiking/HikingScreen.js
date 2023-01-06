@@ -14,14 +14,11 @@ import MapView, { Marker, Polyline } from 'react-native-maps';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStopwatch } from 'react-timer-hook';
 import CustomButton from '../../components/CustomButton';
-import LoadingIndicator from '../../components/LoadingIndicator';
 import { ModalContext } from '../../utils/ModalContext';
-import { hideLoading, showLoading } from '../../slices/loadingSlice';
 import { createPost } from '../../slices/postSlice';
 
 export default HikingScreen = () => {
     const navigation = useNavigation();
-    const [mapLoading, setMapLoading] = useState(false);
     const [snapshotUri, setSnapshotUri] = useState(null);
     const dispatch = useDispatch();
 
@@ -75,18 +72,20 @@ export default HikingScreen = () => {
     const user = useSelector((state) => state.auth.user);
     const LOCATION_TASK_NAME = 'LOCATION_TASK_NAME';
 
-    const onFinishPressed = () => {
+    const onFinishPressed = async () => {
         console.error(mapViewRef);
-        // const response = await showModal({
-        //     message: '등산을 완료하겠습니까?',
-        //     type: 'confirm',
-        //     buttonTexts: ['계속등산하기', '완료하기'],
-        //     async: true,
-        // });
-        // if (response) {
-        //     return;
-        // } else {
-        const snapshot = mapViewRef.takeSnapshot({
+        const tempMapViewRef = mapViewRef;
+        const response = await showModal({
+            message: '등산을 완료하겠습니까?',
+            type: 'confirm',
+            buttonTexts: ['계속등산하기', '완료하기'],
+            async: true,
+        });
+        if (response) {
+            return;
+        }
+        // console.error(test);
+        const snapshot = tempMapViewRef.takeSnapshot({
             width: 300,
             height: 300,
             format: 'png',
@@ -113,10 +112,8 @@ export default HikingScreen = () => {
             })
             .catch((error) => {
                 console.error(error);
-                dispatch(hideLoading());
                 console.error('실패');
             });
-        // }
     };
 
     const onTogglePressed = () => {
@@ -274,12 +271,10 @@ export default HikingScreen = () => {
                     console.log('위치 권한 요청 허용');
                     setCurrentPosition()
                         .then((resp) => {
-                            setMapLoading(false);
                             start();
                             startBackgroundPositionUpdate();
                         })
                         .catch((error) => {
-                            setMapLoading(false);
                             showModal({
                                 message: '위치정보를 가져올 수 없습니다.',
                             });
@@ -291,7 +286,6 @@ export default HikingScreen = () => {
                             '위치 엑세스 권한을 허용하셔야 해당 기능을 사용할 수 있습니다',
                         async: true,
                     });
-                    setMapLoading(false);
                     navigation.navigate('MainTab');
                 }
             })
@@ -313,46 +307,38 @@ export default HikingScreen = () => {
 
     return (
         <View style={styles.container}>
-            {!mapLoading && (
-                <>
-                    <MapView
-                        ref={(mapView) => {
-                            mapViewRef = mapView;
-                        }}
-                        showUserLocation
-                        followUserLocation
-                        loadingEnabled
-                        region={getMapRegion()}
-                        style={styles.mapContainer}
-                    >
-                        <Marker.Animated
-                            ref={markerRef}
-                            coordinate={{
-                                latitude: position.latitude,
-                                longitude: position.longitude,
-                            }}
-                        >
-                            <Fontisto
-                                name="map-marker-alt"
-                                size={24}
-                                color="#FF0000"
-                            />
-                        </Marker.Animated>
-                        <Polyline
-                            coordinates={position.routeCoords}
-                            strokeWidth={5}
-                            strokeColor="#FF0000"
-                        />
-                    </MapView>
-                    <MaterialIcons
-                        style={styles.myLocation}
-                        name="my-location"
-                        size={25}
-                        color="black"
-                        onPress={onMoveMapToCurrentRegion}
-                    />
-                </>
-            )}
+            <MapView
+                ref={(mapView) => {
+                    mapViewRef = mapView;
+                }}
+                showUserLocation
+                followUserLocation
+                loadingEnabled
+                region={getMapRegion()}
+                style={styles.mapContainer}
+            >
+                <Marker.Animated
+                    ref={markerRef}
+                    coordinate={{
+                        latitude: position.latitude,
+                        longitude: position.longitude,
+                    }}
+                >
+                    <Fontisto name="map-marker-alt" size={24} color="#FF0000" />
+                </Marker.Animated>
+                <Polyline
+                    coordinates={position.routeCoords}
+                    strokeWidth={5}
+                    strokeColor="#FF0000"
+                />
+            </MapView>
+            <MaterialIcons
+                style={styles.myLocation}
+                name="my-location"
+                size={25}
+                color="black"
+                onPress={onMoveMapToCurrentRegion}
+            />
 
             <View style={styles.contentContainer}>
                 <View style={styles.timerContainer}>
@@ -426,7 +412,6 @@ export default HikingScreen = () => {
                     />
                 )}
             </View>
-            <LoadingIndicator loading={mapLoading} />
         </View>
     );
 };
