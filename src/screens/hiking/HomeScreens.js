@@ -15,11 +15,6 @@ const HomeScreen = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
 
-    const onLogoutPressed = () => {
-        navigation.navigate('Login');
-        dispatch(logout());
-    };
-
     const onHikingPressed = () => {
         navigation.navigate('Hiking');
     };
@@ -28,15 +23,11 @@ const HomeScreen = () => {
         navigation.navigate('Hiking');
     };
 
-    const scrollViewRef = useRef();
     return (
         <KeyboardAwareScrollView
             contentContainerStyle={styles.container}
             resetScrollToCoords={{ x: 0, y: 0 }}
             scrollEnabled={false}
-            innerRef={(ref) => {
-                scrollViewRef = ref;
-            }}
             keyboardShouldPersistTaps={'handled'}
         >
             <View>
@@ -55,10 +46,7 @@ const HomeScreen = () => {
                 </View>
 
                 <AutocompleteDropdown
-                    onFocus={() => {
-                        // console.error(scrollViewRef);
-                        // scrollViewRef.scrollToEnd({ animated: true });
-                    }}
+                    onFocus={() => {}}
                     clearOnFocus={false}
                     closeOnBlur={true}
                     closeOnSubmit={false}
@@ -117,10 +105,6 @@ const HomeScreen = () => {
                         text="등산하기"
                         disabled={mountain ? false : true}
                     />
-                    <CustomButton
-                        onPress={onLogoutPressed}
-                        text="임시 로그아웃"
-                    />
                 </View>
             </View>
         </KeyboardAwareScrollView>
@@ -136,10 +120,10 @@ const styles = StyleSheet.create({
     },
     logoContainer: {
         marginTop: '30%',
-        marginBottom: '60%',
+        marginBottom: '10%',
     },
     buttonContainer: {
-        marginTop: '20%',
+        marginTop: '80%',
     },
     text: {
         fontSize: 28,

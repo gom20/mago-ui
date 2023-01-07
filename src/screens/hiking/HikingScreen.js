@@ -14,8 +14,8 @@ import MapView, { Marker, Polyline } from 'react-native-maps';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStopwatch } from 'react-timer-hook';
 import CustomButton from '../../components/CustomButton';
+import { createRecord } from '../../slices/recordSlice';
 import { ModalContext } from '../../utils/ModalContext';
-import { createPost } from '../../slices/postSlice';
 
 export default HikingScreen = () => {
     const navigation = useNavigation();
@@ -104,7 +104,7 @@ export default HikingScreen = () => {
                     maxAltitude: position.altitude,
                     imgPath: uri,
                 };
-                dispatch(createPost(request))
+                dispatch(createRecord(request))
                     .unwrap()
                     .then((resp) => {
                         navigation.navigate('MainTab');

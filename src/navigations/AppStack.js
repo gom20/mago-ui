@@ -1,15 +1,11 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import LoginScreen from '../screens/auth/LoginScreen';
-import SignUpScreen from '../screens/auth/SignUpScreen';
-import PasswordReset from '../screens/auth/PasswordResetScreen';
 import { useSelector } from 'react-redux';
+import LoginScreen from '../screens/auth/LoginScreen';
 import OnboardScreen from '../screens/auth/OnboardScreen';
+import PasswordReset from '../screens/auth/PasswordResetScreen';
+import SignUpScreen from '../screens/auth/SignUpScreen';
 import SignUpSuccessScreen from '../screens/auth/SignUpSucessScreen';
-import { Image } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import MainTab from './MainTab';
-import HomeScreen from '../screens/hiking/HomeScreens';
 import HomeStack from './HomeStack';
 
 const Stack = createStackNavigator();
