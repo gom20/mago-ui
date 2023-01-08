@@ -1,12 +1,11 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import { useDispatch } from 'react-redux';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
 import { login } from '../../slices/authSlice';
-import { showLoading } from '../../slices/loadingSlice';
 
 const LoginScreen = () => {
     const [email, setEmail] = useState('');

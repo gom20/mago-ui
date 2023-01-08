@@ -28,16 +28,13 @@ const OnboardScreen = () => {
     return (
         <View style={styles.container}>
             <ImageBackground
-                source={require('../../assets/images/mountain_bg.png')}
+                source={require('../../assets/images/mountain_bg.jpg')}
                 resizeMode="cover"
                 style={styles.bg}
             >
                 <View style={styles.logoContainer}>
-                    <Image
-                        source={require('../../assets/images/mago_logo_white.png')}
-                    ></Image>
-                    <Text style={styles.text}> 나의 산을 기록하다</Text>
-                    <Text style={styles.text}> 마운틴고 </Text>
+                    <Text style={styles.headlineText}>마운틴고</Text>
+                    <Text style={styles.text}>나의 산을 기록하다</Text>
                 </View>
                 <View style={styles.buttonContainer}>
                     <CustomButton
@@ -89,6 +86,12 @@ const styles = StyleSheet.create({
         marginBottom: '30%',
         marginLeft: '10%',
         marginRight: '10%',
+    },
+    headlineText: {
+        color: '#FFFFFF',
+        fontSize: 30,
+        // fontWeight: '300',
+        fontFamily: 'Jalnan',
     },
     text: {
         color: '#FFFFFF',

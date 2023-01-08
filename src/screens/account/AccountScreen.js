@@ -19,9 +19,9 @@ const AccountScreen = () => {
             message: '로그아웃 하시겠습니까',
             type: 'confirm',
             async: true,
-            buttonTexts: ['확인', '취소'],
+            buttonTexts: ['취소', '확인'],
         });
-        if (response) {
+        if (!response) {
             dispatch(logout())
                 .unwrap()
                 .then((response) => {

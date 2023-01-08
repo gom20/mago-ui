@@ -9,7 +9,7 @@ import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import haversine from 'haversine';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStopwatch } from 'react-timer-hook';
@@ -17,9 +17,8 @@ import CustomButton from '../../components/CustomButton';
 import { createRecord } from '../../slices/recordSlice';
 import { ModalContext } from '../../utils/ModalContext';
 
-export default HikingScreen = () => {
+export default HikingScreen = ({ route }) => {
     const navigation = useNavigation();
-    const [snapshotUri, setSnapshotUri] = useState(null);
     const dispatch = useDispatch();
 
     // Stop Watch
@@ -62,52 +61,67 @@ export default HikingScreen = () => {
         latitude: LATITUDE,
         longitude: LONGITUDE,
         altitude: ALTITUDE,
+        minAltitude: 10000,
+        maxAltitude: 0,
         routeCoords: [],
         distance: 0,
         prevLatLng: {},
     });
 
+    //Hiking Record
+    const [startDatetime, setStartDatetime] = useState(null);
+    const user = useSelector((state) => state.auth.user);
+    const LOCATION_TASK_NAME = 'BACKGROUND-LOCATION-TASK';
     let markerRef = useRef();
     let mapViewRef = useRef();
-    const user = useSelector((state) => state.auth.user);
-    const LOCATION_TASK_NAME = 'LOCATION_TASK_NAME';
 
     const onFinishPressed = async () => {
-        console.error(mapViewRef);
+        stopHiking();
         const tempMapViewRef = mapViewRef;
         const response = await showModal({
             message: '등산을 완료하겠습니까?',
             type: 'confirm',
-            buttonTexts: ['계속등산하기', '완료하기'],
+            buttonTexts: ['취소', '완료'],
             async: true,
         });
         if (response) {
+            startHiking();
             return;
         }
-        // console.error(test);
+
         const snapshot = tempMapViewRef.takeSnapshot({
             width: 300,
-            height: 300,
+            height: 200,
             format: 'png',
             quality: 0.5,
             result: 'file',
         });
         snapshot
             .then((uri) => {
-                const request = {
-                    email: user.email,
-                    mountain: '청계산',
-                    startDatetime: '2023-01-05T08:08:22',
-                    endDatetime: '2023-01-05T09:22:33',
-                    distance: position.distance,
-                    minAltitude: position.altitude,
-                    maxAltitude: position.altitude,
-                    imgPath: uri,
+                const _timestamp = (date) => {
+                    date.setHours(date.getHours() + 9);
+                    return date.toISOString().substring(0, 20);
                 };
-                dispatch(createRecord(request))
+                dispatch(
+                    createRecord({
+                        email: user.email,
+                        mountain: route.params.mountain,
+                        startDatetime: _timestamp(startDatetime),
+                        endDatetime: _timestamp(new Date()),
+                        distance: position.distance,
+                        minAltitude: position.minAltitude,
+                        maxAltitude: position.maxAltitude,
+                        imgPath: uri,
+                    })
+                )
                     .unwrap()
-                    .then((resp) => {
-                        navigation.navigate('MainTab');
+                    .then((response) => {
+                        navigation.navigate('나의 산 기록', {
+                            screen: 'RecordDetail',
+                            params: {
+                                recordId: response.data.uid,
+                            },
+                        });
                     });
             })
             .catch((error) => {
@@ -118,19 +132,29 @@ export default HikingScreen = () => {
 
     const onTogglePressed = () => {
         if (isRecordRunning) {
-            pause();
-            stopBackgroundPositionUpdate();
-            setToggleButtonProps(pausedToggleButtonProps);
+            stopHiking();
         } else {
-            start();
-            startBackgroundPositionUpdate();
-            setToggleButtonProps(startedToggleButtonProps);
+            startHiking();
         }
-        setIsRecordRunning(!isRecordRunning);
     };
 
     const onMoveMapToCurrentRegion = () => {
         mapViewRef.animateToRegion(getMapRegion());
+    };
+
+    const startHiking = () => {
+        if (!startDatetime) setStartDatetime(new Date());
+        start();
+        startBackgroundPositionUpdate();
+        setToggleButtonProps(startedToggleButtonProps);
+        setIsRecordRunning(true);
+    };
+
+    const stopHiking = () => {
+        pause();
+        stopBackgroundPositionUpdate();
+        setToggleButtonProps(pausedToggleButtonProps);
+        setIsRecordRunning(false);
     };
 
     /**
@@ -163,7 +187,7 @@ export default HikingScreen = () => {
      * 갱신된 위치로 state 값 업데이트
      * @param {*} newPosition
      */
-    const updatePosition = (newPosition) => {
+    const setUpdatedPosition = (newPosition) => {
         const _calcDistance = (prevLatLng, newLatLng) => {
             return haversine(prevLatLng, newLatLng, { unit: 'meter' }) || 0;
         };
@@ -180,6 +204,8 @@ export default HikingScreen = () => {
             latitude,
             longitude,
             altitude,
+            minAltitude: Math.min(prev.minAltitude, altitude),
+            maxAltitude: Math.max(prev.maxAltitude, altitude),
             routeCoords: [...prev.routeCoords, newCoord],
             distance: prev.distance + _calcDistance(prev.prevLatLng, newCoord), // 이동거리
             prevLatLng: newCoord,
@@ -246,7 +272,7 @@ export default HikingScreen = () => {
             const { locations } = data;
             const location = locations[0];
             if (location) {
-                updatePosition(location);
+                setUpdatedPosition(location);
                 console.log('Location in background', location.coords);
             }
         }
@@ -271,8 +297,7 @@ export default HikingScreen = () => {
                     console.log('위치 권한 요청 허용');
                     setCurrentPosition()
                         .then((resp) => {
-                            start();
-                            startBackgroundPositionUpdate();
+                            startHiking();
                         })
                         .catch((error) => {
                             showModal({
@@ -332,13 +357,14 @@ export default HikingScreen = () => {
                     strokeColor="#FF0000"
                 />
             </MapView>
-            <MaterialIcons
-                style={styles.myLocation}
-                name="my-location"
-                size={25}
-                color="black"
-                onPress={onMoveMapToCurrentRegion}
-            />
+            <View style={styles.myLocation}>
+                <MaterialIcons
+                    name="gps-fixed"
+                    size={25}
+                    color="black"
+                    onPress={onMoveMapToCurrentRegion}
+                />
+            </View>
 
             <View style={styles.contentContainer}>
                 <View style={styles.timerContainer}>
@@ -397,20 +423,6 @@ export default HikingScreen = () => {
                         fontSize={14}
                     />
                 </View>
-                {snapshotUri && (
-                    <Image
-                        style={{
-                            width: '100%',
-                            height: '100%',
-                            resizeMode: 'contain',
-                            borderColor: 'red',
-                            borderWidth: 10,
-                        }}
-                        source={{
-                            uri: snapshotUri,
-                        }}
-                    />
-                )}
             </View>
         </View>
     );
@@ -429,8 +441,15 @@ const styles = StyleSheet.create({
     },
     myLocation: {
         position: 'absolute',
-        top: '65%',
+        top: '62%',
         right: '5%',
+        width: 45,
+        height: 45,
+        elevation: 2,
+        borderRadius: 25,
+        backgroundColor: '#ffffff',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     contentContainer: {
         width: '100%',
@@ -443,7 +462,7 @@ const styles = StyleSheet.create({
         paddingVertical: '5%',
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        elevation: 3,
+        elevation: 4,
         position: 'absolute',
         bottom: 0,
     },

@@ -1,26 +1,17 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
-import { useDispatch, useSelector } from 'react-redux';
 import CustomButton from '../../components/CustomButton';
-import { logout } from '../../slices/authSlice';
 import mountains from './../../../mountains.json';
 
 const HomeScreen = () => {
-    const auth = useSelector((state) => state.auth);
     const [mountain, setMountain] = useState('');
-
-    const dispatch = useDispatch();
     const navigation = useNavigation();
 
     const onHikingPressed = () => {
-        navigation.navigate('Hiking');
-    };
-
-    const onPostPressed = () => {
-        navigation.navigate('Hiking');
+        navigation.navigate('Hiking', { mountain: mountain });
     };
 
     return (
@@ -129,6 +120,7 @@ const styles = StyleSheet.create({
         fontSize: 28,
         fontWeight: '300',
         marginBottom: '3%',
+        fontFamily: 'Jalnan',
     },
     smallText: {
         color: '#949494',

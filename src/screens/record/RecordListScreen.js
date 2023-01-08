@@ -1,5 +1,6 @@
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     FlatList,
     ScrollView,
@@ -13,13 +14,22 @@ import { getRecords } from '../../slices/recordSlice';
 
 function RecordListScreen() {
     const dispatch = useDispatch();
-    const records = useSelector((state) => state.record.records);
+    const recordsByMonth = useSelector((state) => state.record.recordsByMonth);
     const navigation = useNavigation();
 
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [deleteMode, setDeleteMode] = useState(false);
     const onItemPressed = (row) => {
-        console.error(row.uid);
-        navigation.navigate('RecordDetail');
+        navigation.navigate('RecordDetail', { recordId: row.uid });
     };
+    const onItemLongPressed = (row) => {
+        console.log('longPressed');
+        // if (!deleteMode) {
+        setDeleteMode(true);
+        // console.log(deleteMode);
+        // }
+    };
+
     const renderItem = ({ item }) => {
         let items = [];
         if (item.groupData) {
@@ -31,14 +41,16 @@ function RecordListScreen() {
                         activeOpacity={0.8}
                         underlayColor="#DBDBDB"
                         onPress={() => onItemPressed(row)}
+                        onLongPress={() => onItemLongPressed(row)}
                     >
                         <View style={styles.item}>
                             <Text style={styles.text}>
-                                {row.dateTime.month}월 {row.dateTime.day}일
+                                {row.dateTime.month}월 {row.dateTime.date}일
                             </Text>
                             <Text style={styles.text}>{row.mountain}</Text>
                             <Text style={styles.text}>
-                                {row.dateTime.hour}시간 {row.dateTime.minute}분
+                                {row.dateTime.totalHour}시간{' '}
+                                {row.dateTime.totalMinute}분
                             </Text>
                         </View>
                     </TouchableHighlight>
@@ -63,26 +75,33 @@ function RecordListScreen() {
         );
     };
 
-    const callApi = () => {
+    const fetchData = () => {
+        setIsRefreshing(true);
         dispatch(getRecords())
             .unwrap()
-            .then((response) => {})
-            .catch((error) => {});
+            .then((response) => {
+                setIsRefreshing(false);
+            })
+            .catch((error) => {
+                setIsRefreshing(false);
+            });
     };
 
     const extractKey = ({ groupData }) => groupData;
 
     useEffect(() => {
-        callApi();
+        fetchData();
     }, []);
 
     return (
         <ScrollView style={styles.container}>
             <FlatList
-                data={records}
+                data={recordsByMonth}
                 renderItem={renderItem}
                 keyExtractor={extractKey}
                 ListEmptyComponent={renderEmptyComponent}
+                onRefresh={fetchData}
+                refreshing={isRefreshing}
             />
         </ScrollView>
     );
@@ -114,6 +133,16 @@ const styles = StyleSheet.create({
     text: {
         fontSize: 16,
         textAlignVertical: 'center',
+    },
+    buttonContainer: {
+        position: 'absolute',
+        top: 0,
+
+        backgroundColor: '#000',
+        height: 25,
+        width: 25,
+        borderTopRightRadius: 30,
+        borderTopLeftRadius: 30,
     },
 });
 

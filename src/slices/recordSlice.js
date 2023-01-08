@@ -1,17 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import recordAPI from '../services/recordAPI';
 
-export const createRecord = createAsyncThunk(
-    'record/createRecord',
-    async (request, thunkAPI) => {
-        try {
-            return await recordAPI.createRecord(request);
-        } catch (error) {
-            return thunkAPI.rejectWithValue();
-        }
-    }
-);
-
 const parseDatetime = (startDatetime, endDatetime) => {
     const WEEKDAY = [
         '일요일',
@@ -25,28 +14,41 @@ const parseDatetime = (startDatetime, endDatetime) => {
     const startDate = new Date(startDatetime);
     const year = startDate.getFullYear();
     const month = startDate.getMonth() + 1;
-    const day = startDate.getDay() + 1;
+    const date = startDate.getDate();
     const weekday = WEEKDAY[startDate.getDay()];
 
     const endDate = new Date(endDatetime);
-    const secondDiff = (endDate - startDate) / 1000;
-    const minute = Math.round((secondDiff % 3600) / 60);
-    let hour = Math.round(secondDiff / 3600);
-    const ampm = hour >= 12 ? '오후' : '오전';
-    hour = hour % 12 ? hour % 12 : 12;
+    const secondDiff = Math.abs(endDate - startDate) / 1000;
+    const totalMinute = Math.ceil((secondDiff % 3600) / 60);
+    let totalHour = Math.round(secondDiff / 3600);
+
+    let startHour = startDate.getHours();
+    startHour = startHour % 12 ? startHour % 12 : 12;
+    const startAmpm = startHour >= 12 ? '오후' : '오전';
+    const startMinute = startDate.getMinutes();
+
+    let endHour = endDate.getHours();
+    endHour = endHour % 12 ? endHour % 12 : 12;
+    const endAmpm = startHour >= 12 ? '오후' : '오전';
+    const endMinute = endDate.getMinutes();
 
     return {
         year: year,
         month: month,
-        day: day,
+        date: date,
         weekday: weekday,
-        ampm: ampm,
-        hour: hour,
-        minute: minute,
+        totalHour: totalHour,
+        totalMinute: totalMinute,
+        startHour: startHour,
+        startMinute: startMinute,
+        startAmpm: startAmpm,
+        endHour: endHour,
+        endMinute: endMinute,
+        endAmpm: endAmpm,
     };
 };
 
-function groupBy(objectArray, property) {
+const groupBy = (objectArray, property) => {
     return objectArray.reduce((acc, obj) => {
         const key = obj[property];
         if (!acc[key]) {
@@ -56,7 +58,25 @@ function groupBy(objectArray, property) {
         acc[key].push(obj);
         return acc;
     }, {});
-}
+};
+
+export const createRecord = createAsyncThunk(
+    'record/createRecord',
+    async (request, thunkAPI) => {
+        try {
+            const response = await recordAPI.createRecord(request);
+            console.error(response);
+            response.data.dateTime = parseDatetime(
+                response.data.startDatetime,
+                response.data.endDatetime
+            );
+            return response;
+        } catch (error) {
+            console.error(error);
+            return thunkAPI.rejectWithValue();
+        }
+    }
+);
 
 export const getRecords = createAsyncThunk(
     'record/getRecords',
@@ -70,17 +90,19 @@ export const getRecords = createAsyncThunk(
                 );
                 item.groupId = item.dateTime.year + '' + item.dateTime.month;
             });
-            const parsedData = groupBy(response.data, 'groupId');
+
+            const groupingData = groupBy(response.data, 'groupId');
             let result = [];
-            Object.entries(parsedData).forEach(([key, value]) => {
+            Object.entries(groupingData).forEach(([key, value]) => {
                 result.push({
                     groupId: key,
                     groupData: value,
                 });
             });
-            response.data = result;
+            response.recordsByMonth = result;
             return response;
         } catch (error) {
+            console.error(error);
             return thunkAPI.rejectWithValue();
         }
     }
@@ -88,6 +110,7 @@ export const getRecords = createAsyncThunk(
 
 const initialState = {
     records: [],
+    recordsByMonth: [],
 };
 
 const recordSlice = createSlice({
@@ -96,13 +119,19 @@ const recordSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(createRecord.fulfilled, (state, action) => {
-                // state.record = action.payload.data;
+                state.records = state.records.concat(action.payload.data);
+                state.recordsByMonth.forEach((group) => {
+                    if (group.groupId == action.payload.data.groupId) {
+                        group.grouData.push(action.payload.data);
+                    }
+                });
             })
             .addCase(createRecord.rejected, (state, action) => {
                 // state.record = {};
             })
             .addCase(getRecords.fulfilled, (state, action) => {
                 state.records = action.payload.data;
+                state.recordsByMonth = action.payload.recordsByMonth;
             })
             .addCase(getRecords.rejected, (state, action) => {
                 state.records = [];
@@ -110,5 +139,11 @@ const recordSlice = createSlice({
             .addDefaultCase((state, action) => {});
     },
 });
+
+export const selectAllRecords = (state) => state.records;
+
+export const selectRecordById = (state, recordId) => {
+    return state.records.find((record) => record.uid == recordId);
+};
 
 export default recordSlice.reducer;

@@ -26,7 +26,7 @@ const RecordStack = () => {
             <Stack.Screen
                 name="RecordDetail"
                 component={RecordDetailScreen}
-                options={{ headerTitle: '기록 상세보기' }}
+                options={{ headerTitle: '기록 상세 보기' }}
             />
         </Stack.Navigator>
     );
