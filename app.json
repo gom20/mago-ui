@@ -7,9 +7,10 @@
         "icon": "./src/assets/images/app-icon.png",
         "userInterfaceStyle": "light",
         "splash": {
-            "image": "./src/assets/images/mago-splash-img.png",
+            "image": "./src/assets/images/splash-logo.png",
             "resizeMode": "contain",
-            "backgroundColor": "#ffffff"
+            "backgroundColor": "#ffffff",
+            "padding": "10%"
         },
         "updates": {
             "fallbackToCacheTimeout": 0

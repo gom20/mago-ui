@@ -5,6 +5,7 @@ import AccountScreen from '../screens/account/AccountScreen';
 import RecordListScreen from '../screens/record/RecordListScreen';
 import HomeScreen from '../screens/hiking/HomeScreens';
 import RecordStack from './RecordStack';
+import StampStack from './StampStack';
 
 const Tab = createBottomTabNavigator();
 
@@ -12,9 +13,8 @@ const MainTab = () => {
     return (
         <Tab.Navigator
             screenOptions={({ route }) => ({
-                // headerShown: false,
-                // tabBarAtiveTintColor: '#0DD36E',
-                // tabBarInactiveTintColor: '#949494',
+                tabBarActiveTintColor: '#0DD36E',
+                tabBarInactiveTintColor: '#949494',
                 tabBarStyle: {
                     backgroundColor: '#FBFBFB',
                 },
@@ -39,10 +39,6 @@ const MainTab = () => {
                     );
                 },
             })}
-            tabBarOptions={{
-                activeTintColor: '#0DD36E',
-                inactiveTintColor: '#949494',
-            }}
         >
             <Tab.Screen
                 name="홈"
@@ -56,8 +52,8 @@ const MainTab = () => {
             />
             <Tab.Screen
                 name="도전 100대 명산"
-                component={RecordListScreen}
-                options={{ headerTitleAlign: 'center' }}
+                component={StampStack}
+                options={{ headerShown: false }}
             />
             <Tab.Screen
                 name="마이"

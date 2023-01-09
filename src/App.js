@@ -7,7 +7,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import AppLayout from './AppLayout';
 import { persistor, store } from './store';
-import { ModalProvider } from './utils/ModalContext';
+import { ModalProvider } from './utils/ModalProvider';
 
 SplashScreen.preventAutoHideAsync();
 

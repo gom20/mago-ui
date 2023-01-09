@@ -2,13 +2,15 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import RecordDetailScreen from '../screens/record/RecordDetailScreen';
 import RecordListScreen from '../screens/record/RecordListScreen';
+import StampDetailScreen from '../screens/stamp/StampDetailScreen';
+import StampMainScreen from '../screens/stamp/StampMainScreen';
 
 const Stack = createStackNavigator();
 
-const RecordStack = () => {
+const StampStack = () => {
     return (
         <Stack.Navigator
-            initialRouteName="RecordList"
+            initialRouteName="StampMain"
             screenOptions={{
                 headerTitleAlign: 'center',
                 headerShown: true,
@@ -17,17 +19,17 @@ const RecordStack = () => {
             }}
         >
             <Stack.Screen
-                name="RecordList"
-                component={RecordListScreen}
-                options={{ headerTitle: '나의 산 기록' }}
+                name="StampMain"
+                component={StampMainScreen}
+                options={{ headerTitle: '도전 100대 명산' }}
             />
             <Stack.Screen
-                name="RecordDetail"
-                component={RecordDetailScreen}
-                options={{ headerTitle: '기록 상세 보기' }}
+                name="StampDetail"
+                component={StampDetailScreen}
+                options={{ headerTitle: '도전 100대 명산' }}
             />
         </Stack.Navigator>
     );
 };
 
-export default RecordStack;
+export default StampStack;
