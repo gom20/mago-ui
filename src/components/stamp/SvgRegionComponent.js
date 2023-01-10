@@ -1,10 +1,10 @@
 import React from 'react';
 import { Path, Svg, SvgXml } from 'react-native-svg';
 
-const SeoulGeonggiSvg = ({ color, width, height }) => (
+const SeoulGeonggiSvg = ({ color, size }) => (
     <Svg
-        width={width ? width : '112.59'}
-        height={height ? height : '143.85'}
+        width="112.59"
+        height="143.85"
         viewBox="0 0 335 376"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -57,10 +57,10 @@ const SeoulGeonggiSvg = ({ color, width, height }) => (
     </Svg>
 );
 
-const GangwonSvg = ({ color, width, height }) => (
+const GangwonSvg = ({ color, size }) => (
     <Svg
-        width={width ? width : '157.1'}
-        height={height ? height : '169.26'}
+        width="157.1"
+        height="169.26"
         viewBox="0 0 467 442"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -77,10 +77,10 @@ const GangwonSvg = ({ color, width, height }) => (
     </Svg>
 );
 
-const ChungnamSvg = ({ color, width, height }) => (
+const ChungnamSvg = ({ color, size }) => (
     <Svg
-        width={width ? width : '104.06'}
-        height={height ? height : '115.81'}
+        width="104.06"
+        height="115.81"
         viewBox="0 0 310 304"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -106,9 +106,9 @@ const ChungnamSvg = ({ color, width, height }) => (
     </Svg>
 );
 
-const ChungbukSvg = ({ color, width, height }) => (
+const ChungbukSvg = ({ color, size }) => (
     <Svg
-        width={width ? width : '102.86'}
+        width="102.86"
         height="127.83"
         viewBox="0 0 306 335"
         fill="none"
@@ -126,10 +126,10 @@ const ChungbukSvg = ({ color, width, height }) => (
     </Svg>
 );
 
-const GyeongbukSvg = ({ color, width, height }) => (
+const GyeongbukSvg = ({ color, size }) => (
     <Svg
-        width={width ? width : '164.36'}
-        height={height ? height : '192.69'}
+        width="164.36"
+        height="192.69"
         viewBox="0 0 488 503"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -164,10 +164,10 @@ const GyeongbukSvg = ({ color, width, height }) => (
     </Svg>
 );
 
-const GyeongnamSvg = ({ color, width, height }) => (
+const GyeongnamSvg = ({ color, size }) => (
     <Svg
-        width={width ? width : '141.7'}
-        height={height ? height : '130.5'}
+        width="141.7"
+        height="130.5"
         viewBox="0 0 421 342"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -229,10 +229,10 @@ const GyeongnamSvg = ({ color, width, height }) => (
     </Svg>
 );
 
-const JeonbukSvg = ({ color, width, height }) => (
+const JeonbukSvg = ({ color, size }) => (
     <Svg
-        width={width ? width : '111.81'}
-        height={height ? height : '88.72'}
+        width="111.81"
+        height="88.72"
         viewBox="0 0 333 233"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -257,10 +257,10 @@ const JeonbukSvg = ({ color, width, height }) => (
         />
     </Svg>
 );
-const JeonnamSvg = ({ color, width, height }) => (
+const JeonnamSvg = ({ color, size }) => (
     <Svg
-        width={width ? width : '130.25'}
-        height={height ? height : '119.05'}
+        width="130.25"
+        height="119.05"
         viewBox="0 0 387 312"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -311,25 +311,48 @@ const JeonnamSvg = ({ color, width, height }) => (
     </Svg>
 );
 
-const JejuSvg = ({ color, width, height }) => (
-    <Svg
-        width={width ? width : '60.58'}
-        height={height ? height : '35.42'}
-        viewBox="0 0 181 95"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-    >
-        <Path
-            d="M52.7241 16.3483C45.9241 17.5483 40.1241 21.6482 35.5241 26.1482C29.1241 32.3482 21.624 37.0483 14.924 42.8483C10.524 46.6483 6.52404 50.6483 3.82404 55.7483C-1.27596 64.9483 0.324042 82.4482 10.324 88.5482C15.724 91.8482 20.9241 94.1482 27.2241 92.5482C29.8241 91.8482 31.824 90.6482 32.924 87.9482C34.124 85.0482 36.4241 84.4483 39.5241 85.3483C49.0241 88.0483 58.924 89.0482 68.624 90.1482C79.824 91.4482 91.124 93.3482 102.824 91.9482C113.124 90.7482 123.524 89.5483 133.924 88.3483C149.824 86.4483 161.424 77.5482 171.424 65.1482C177.924 57.1482 179.424 48.4482 179.424 38.9482C179.424 35.5482 179.424 32.1483 179.824 28.7483C180.424 22.5483 173.324 12.8483 167.124 10.8483C166.124 10.5483 164.524 10.4483 164.124 9.74829C160.824 4.34829 154.224 4.84829 149.724 1.74829C148.724 1.04829 146.724 0.748287 145.724 1.24829C137.024 6.14829 127.324 4.74821 118.124 5.04821C110.024 5.34821 102.124 6.44829 94.124 7.24829C92.624 7.44829 91.0241 7.74829 89.5241 7.74829C81.3241 7.84829 74.224 10.3483 67.424 15.2483C63.424 17.9483 57.8241 17.5483 52.7241 16.3483Z"
-            stroke="#FFFFFF"
-            strokeWidth="5"
-            stroke-miterlimit="10"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            fill={color ? color : '#E1F7CB'}
-        />
-    </Svg>
-);
+const JejuSvg = ({ color, size }) => {
+    if (size == 'LARGE') {
+        return (
+            <Svg
+                width="330"
+                height="380"
+                viewBox="0 0 330 380"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <Path
+                    d="M101.1 138.4C89.6001 140.4 79.7001 147.4 71.9001 155C61.0001 165.5 48.3001 173.5 36.9001 183.4C29.4001 189.9 22.6001 196.6 18.1001 205.3C9.40005 220.9 12.2001 250.6 29.1001 261C38.3001 266.6 47.1001 270.5 57.8001 267.8C62.2001 266.6 65.6001 264.6 67.5001 260C69.5001 255.1 73.4001 254.1 78.7001 255.6C94.8001 260.2 111.6 261.9 128.1 263.7C147.1 265.9 166.3 269.1 186.2 266.8C203.7 264.8 221.3 262.7 239 260.7C266 257.5 285.7 242.4 302.7 221.3C313.7 207.7 316.3 192.9 316.3 176.8C316.3 171 316.3 165.3 317 159.5C318 149 306 132.5 295.4 129.1C293.7 128.6 291 128.4 290.3 127.2C284.7 118 273.5 118.9 265.9 113.6C264.2 112.4 260.8 111.9 259.1 112.8C244.3 121.1 227.9 118.7 212.2 119.3C198.4 119.8 185 121.7 171.5 123C169 123.3 166.2 123.8 163.7 123.8C149.8 124 137.7 128.2 126.2 136.5C119.3 141.1 109.8 140.4 101.1 138.4Z"
+                    stroke="black"
+                    stroke-width="2"
+                    stroke-miterlimit="10"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                />
+            </Svg>
+        );
+    } else {
+        return (
+            <Svg
+                width="60.58"
+                height="35.42"
+                viewBox="0 0 181 95"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <Path
+                    d="M52.7241 16.3483C45.9241 17.5483 40.1241 21.6482 35.5241 26.1482C29.1241 32.3482 21.624 37.0483 14.924 42.8483C10.524 46.6483 6.52404 50.6483 3.82404 55.7483C-1.27596 64.9483 0.324042 82.4482 10.324 88.5482C15.724 91.8482 20.9241 94.1482 27.2241 92.5482C29.8241 91.8482 31.824 90.6482 32.924 87.9482C34.124 85.0482 36.4241 84.4483 39.5241 85.3483C49.0241 88.0483 58.924 89.0482 68.624 90.1482C79.824 91.4482 91.124 93.3482 102.824 91.9482C113.124 90.7482 123.524 89.5483 133.924 88.3483C149.824 86.4483 161.424 77.5482 171.424 65.1482C177.924 57.1482 179.424 48.4482 179.424 38.9482C179.424 35.5482 179.424 32.1483 179.824 28.7483C180.424 22.5483 173.324 12.8483 167.124 10.8483C166.124 10.5483 164.524 10.4483 164.124 9.74829C160.824 4.34829 154.224 4.84829 149.724 1.74829C148.724 1.04829 146.724 0.748287 145.724 1.24829C137.024 6.14829 127.324 4.74821 118.124 5.04821C110.024 5.34821 102.124 6.44829 94.124 7.24829C92.624 7.44829 91.0241 7.74829 89.5241 7.74829C81.3241 7.84829 74.224 10.3483 67.424 15.2483C63.424 17.9483 57.8241 17.5483 52.7241 16.3483Z"
+                    stroke="#FFFFFF"
+                    strokeWidth="5"
+                    stroke-miterlimit="10"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    fill={color ? color : '#E1F7CB'}
+                />
+            </Svg>
+        );
+    }
+};
 
 export {
     SeoulGeonggiSvg,
