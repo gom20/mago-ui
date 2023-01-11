@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import MountainComponent from '../../components/stamp/MountainComponent';
@@ -8,26 +8,50 @@ import {
     selectFlagCountByRegionType,
     selectStampsByRegionType,
 } from '../../slices/stampSlice';
+import Confetti from 'react-native-confetti';
+import { ModalContext } from '../../utils/ModalContext';
 
 function StampDetailScreen({ route }) {
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const { regionType, regionName } = route.params;
+    const { showModal } = useContext(ModalContext);
     const StampsByRegion = useSelector((state) =>
         selectStampsByRegionType(state.stamp, regionType)
     );
     const StampsByRegionCount = useSelector((state) =>
         selectFlagCountByRegionType(state.stamp, regionType)
     );
+    let confettiRef;
 
+    const onPressed = (check) => {
+        if (check && StampsByRegionCount == StampsByRegion.length - 1) {
+            const message =
+                '대단해요!\n' +
+                regionName +
+                ' 산을 모두 완료하셨습니다!\n다른 도에도 명산들이 많아요!\n지금 바로 도전해 보세요!';
+            showModal({
+                message: message,
+                image: require('../../assets/images/completed.png'),
+            });
+        }
+    };
     useEffect(() => {
-        console.log(StampsByRegion);
-        // console.log(mountains);
-        // fetchData();
+        if (StampsByRegionCount == StampsByRegion.length) {
+            confettiRef.startConfetti();
+        }
+
+        console.log('useEffect');
     }, []);
 
     return (
         <View style={styles.container}>
+            <Confetti
+                ref={(ref) => (confettiRef = ref)}
+                duration={6000}
+                confettiCount={30}
+                // timeout={}
+            />
             <Text style={styles.text}>{regionName}</Text>
             <Text style={styles.smallText}>
                 {regionName}의 명산{'\n'}기본 산에 스탬프를 꾹!
@@ -74,6 +98,7 @@ function StampDetailScreen({ route }) {
                                 positionX={Number(stamp.positionX)}
                                 positionY={Number(stamp.positionY)}
                                 flag={stamp.flag}
+                                onPressed={onPressed}
                             ></MountainComponent>
                         );
                     })}

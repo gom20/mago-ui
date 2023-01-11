@@ -1,34 +1,15 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import Confetti from 'react-native-confetti';
 import { useDispatch, useSelector } from 'react-redux';
 import RegionComponent from '../../components/stamp/RegionComponent';
 import { getStamps, selectStampCount } from '../../slices/stampSlice';
 
 function StampMainScreen() {
     const dispatch = useDispatch();
-    const navigation = useNavigation();
     const stamps = useSelector((state) => state.stamp.stamps);
     const flagCount = useSelector((state) => selectStampCount(state.stamp));
-
-    const [seoulGeonggiColor, setSeoulGeonggiColor] = useState('#E1F7CB');
-
-    const [gangwonColor, setGangwonColor] = useState('#E1F7CB');
-    const [chungbukColor, setChungbukColor] = useState('#E1F7CB');
-    const [chungnamColor, setChungnamColor] = useState('#E1F7CB');
-    const [gyeongbukColor, setGyeongbukColor] = useState('#E1F7CB');
-    const [gyeongnamColor, setGyeongnamColor] = useState('#E1F7CB');
-    const [jeonbukColor, setJeonbukColor] = useState('#E1F7CB');
-    const [jeonnamColor, setJeonnamColor] = useState('#E1F7CB');
-    const [jejuColor, setJejuColor] = useState('#E1F7CB');
-
-    const onRegionPressed = (regionType, regionName) => {
-        console.log(regionType);
-        navigation.navigate('StampDetail', {
-            regionType: regionType,
-            regionName: regionName,
-        });
-    };
 
     const fetchData = () => {
         dispatch(getStamps())
@@ -36,13 +17,101 @@ function StampMainScreen() {
             .then((response) => {})
             .catch((error) => {});
     };
+    let confettiRef;
+    const regionList = [
+        {
+            regionType: 'SG',
+            regionName: '서울/경기',
+            top: 26.55,
+            left: 59.02,
+            pressableTop: 52,
+            pressableLeft: 33,
+        },
+        {
+            regionType: 'GW',
+            regionName: '강원도',
+            top: 0,
+            left: 124,
+            pressableTop: 60,
+            pressableLeft: 60,
+        },
+        {
+            regionType: 'CN',
+            regionName: '충청남도',
+            top: 136,
+            left: 42.07,
+            pressableTop: 40,
+            pressableLeft: 30,
+        },
+        {
+            regionType: 'CB',
+            regionName: '충청북도',
+            top: 124,
+            left: 125,
+            pressableTop: 18,
+            pressableLeft: 10,
+        },
+        {
+            regionType: 'GB',
+            regionName: '경상북도',
+            top: 109,
+            left: 163,
+            pressableTop: 90,
+            pressableLeft: 40,
+        },
+        {
+            regionType: 'GN',
+            regionName: '경상남도',
+            top: 244,
+            left: 138,
+            pressableTop: 45,
+            pressableLeft: 40,
+        },
+        {
+            regionType: 'JB',
+            regionName: '전라북도',
+            top: 221,
+            left: 55,
+            pressableTop: 20,
+            pressableLeft: 30,
+        },
+        {
+            regionType: 'JN',
+            regionName: '전라남도',
+            top: 277,
+            left: 20,
+            pressableTop: 30,
+            pressableLeft: 50,
+        },
+        {
+            regionType: 'JJ',
+            regionName: '제주도',
+            top: 410,
+            left: 53,
+            pressableTop: 0,
+            pressableLeft: 10,
+        },
+    ];
 
     useEffect(() => {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        console.log('[StampMainScreen] useEffect');
+        if (flagCount == 100) {
+            console.log('[StampMainScreen] startConfetti');
+            confettiRef.startConfetti();
+        }
+    }, [flagCount]);
+
     return (
         <View style={styles.container}>
+            <Confetti
+                ref={(ref) => (confettiRef = ref)}
+                duration={6000}
+                confettiCount={30}
+            />
             <Text style={styles.text}>도전! 스탬프찍기!</Text>
             <Text style={styles.smallText}>
                 100대 명산 얼마나 가봤나요?{'\n'}지금까지 가본 산에 스탬프를
@@ -64,114 +133,24 @@ function StampMainScreen() {
             </View>
 
             <View style={styles.mapContainer}>
-                <View style={{ position: 'absolute', top: 26.55, left: 59.02 }}>
-                    <RegionComponent
-                        regionType="SG"
-                        regionName="서울/경기"
-                        regionColor={seoulGeonggiColor}
-                        setRegionColor={setSeoulGeonggiColor}
-                        onRegionPressed={onRegionPressed}
-                        positionY={52}
-                        positionX={33}
-                        pressable={true}
-                    />
-                </View>
-                <View style={{ position: 'absolute', top: 0, left: 124 }}>
-                    <RegionComponent
-                        regionType="GW"
-                        regionName="강원도"
-                        regionColor={gangwonColor}
-                        setRegionColor={setGangwonColor}
-                        onRegionPressed={onRegionPressed}
-                        positionY={60}
-                        positionX={60}
-                        pressable={true}
-                    />
-                </View>
-                <View style={{ position: 'absolute', top: 136, left: 42.07 }}>
-                    <RegionComponent
-                        regionType="CN"
-                        regionName="충청남도"
-                        regionColor={chungnamColor}
-                        setRegionColor={setChungnamColor}
-                        onRegionPressed={onRegionPressed}
-                        positionY={40}
-                        positionX={30}
-                        pressable={true}
-                    />
-                </View>
-                <View style={{ position: 'absolute', top: 124, left: 125 }}>
-                    <RegionComponent
-                        regionType="CB"
-                        regionName="충청북도"
-                        regionColor={chungbukColor}
-                        setRegionColor={setChungbukColor}
-                        onRegionPressed={onRegionPressed}
-                        positionY={18}
-                        positionX={10}
-                        pressable={true}
-                    />
-                </View>
-                <View style={{ position: 'absolute', top: 109, left: 163 }}>
-                    <RegionComponent
-                        regionType="GB"
-                        regionName="경상북도"
-                        regionColor={gyeongbukColor}
-                        setRegionColor={setGyeongbukColor}
-                        onRegionPressed={onRegionPressed}
-                        positionY={90}
-                        positionX={40}
-                        pressable={true}
-                    />
-                </View>
-                <View style={{ position: 'absolute', top: 244, left: 138 }}>
-                    <RegionComponent
-                        regionType="GN"
-                        regionName="경상남도"
-                        regionColor={gyeongnamColor}
-                        setRegionColor={setGyeongnamColor}
-                        onRegionPressed={onRegionPressed}
-                        positionY={45}
-                        positionX={40}
-                        pressable={true}
-                    />
-                </View>
-                <View style={{ position: 'absolute', top: 221, left: 55 }}>
-                    <RegionComponent
-                        regionType="JB"
-                        regionName="전라북도"
-                        regionColor={jeonbukColor}
-                        setRegionColor={setJeonbukColor}
-                        onRegionPressed={onRegionPressed}
-                        positionY={20}
-                        positionX={30}
-                        pressable={true}
-                    />
-                </View>
-                <View style={{ position: 'absolute', top: 277, left: 20 }}>
-                    <RegionComponent
-                        regionType="JN"
-                        regionName="전라남도"
-                        regionColor={jeonnamColor}
-                        setRegionColor={setJeonnamColor}
-                        onRegionPressed={onRegionPressed}
-                        positionY={30}
-                        positionX={50}
-                        pressable={true}
-                    />
-                </View>
-                <View style={{ position: 'absolute', top: 410, left: 53 }}>
-                    <RegionComponent
-                        regionType="JJ"
-                        regionName="제주도"
-                        regionColor={jejuColor}
-                        setRegionColor={setJejuColor}
-                        onRegionPressed={onRegionPressed}
-                        positionY={0}
-                        positionX={10}
-                        pressable={true}
-                    />
-                </View>
+                {regionList.map((region) => (
+                    <View
+                        key={region.regionType}
+                        style={{
+                            position: 'absolute',
+                            top: region.top,
+                            left: region.left,
+                        }}
+                    >
+                        <RegionComponent
+                            regionType={region.regionType}
+                            regionName={region.regionName}
+                            pressable={true}
+                            pressableTop={region.pressableTop}
+                            pressableLeft={region.pressableLeft}
+                        />
+                    </View>
+                ))}
             </View>
         </View>
     );
@@ -179,7 +158,6 @@ function StampMainScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        // backgroundColor: '#FFFFFF',
         paddingHorizontal: '5%',
     },
     text: {

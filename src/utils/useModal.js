@@ -6,6 +6,7 @@ export default () => {
         message: '',
         type: '',
         buttonTexts: [],
+        image: '',
     };
     const [modalProps, setModalProps] = useState(initialState);
     const resolveRef = useRef();
@@ -15,12 +16,14 @@ export default () => {
         type = 'alert',
         async = false,
         buttonTexts = ['확인'],
+        image,
     }) => {
         setModalProps({
             visible: true,
             message,
             type,
             buttonTexts,
+            image,
         });
         if (async) {
             return new Promise((resolve) => {

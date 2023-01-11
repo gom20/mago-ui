@@ -8,6 +8,7 @@ const MountainComponent = ({
     positionX,
     positionY,
     flag,
+    onPressed,
 }) => {
     const dispatch = useDispatch();
     const onMountainPressed = () => {
@@ -19,7 +20,9 @@ const MountainComponent = ({
             })
         )
             .unwrap()
-            .then((response) => {})
+            .then((response) => {
+                onPressed(!flag);
+            })
             .catch((error) => {});
     };
 
@@ -42,7 +45,9 @@ const MountainComponent = ({
                 ></Image>
             )}
             <Pressable
-                onPress={onMountainPressed}
+                onPress={() => {
+                    onMountainPressed();
+                }}
                 style={styles.pressableContainer}
             >
                 <Image

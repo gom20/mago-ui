@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 import { ModalContext } from '../utils/ModalContext';
 
@@ -7,8 +7,19 @@ const CustomModal = ({}) => {
     let { modalProps, showModal, hideModal } = useContext(ModalContext);
 
     return (
-        <Modal isVisible={modalProps.visible} style={styles.container}>
+        <Modal
+            isVisible={modalProps.visible}
+            style={styles.container}
+            animationIn={'fadeIn'}
+            animationOut={'slideOutDown'}
+        >
             <View style={styles.modalContent}>
+                {modalProps.image && (
+                    <Image
+                        source={modalProps.image}
+                        style={{ marginTop: '10%' }}
+                    ></Image>
+                )}
                 <Text style={styles.contentText}>{modalProps.message}</Text>
                 <View style={styles.line}></View>
                 {modalProps.type == 'alert' && (
@@ -56,7 +67,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     modalContent: {
-        backgroundColor: 'white',
+        // flex: 1,
+        backgroundColor: '#FFFFFF',
         justifyContent: 'space-between',
         alignItems: 'center',
         width: 280,
@@ -67,6 +79,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 10,
         padding: 20,
+        textAlign: 'center',
     },
     line: {
         alignSelf: 'stretch',

@@ -29,8 +29,6 @@ export const updateStamp = createAsyncThunk(
 
 const initialState = {
     stamps: [],
-    totalCount: 100,
-    totalFlagCount: 0,
 };
 
 const stampSlice = createSlice({
@@ -66,6 +64,16 @@ export const selectFlagCountByRegionType = (state, regionType) => {
     return state.stamps.filter(
         (stamp) => stamp.regionType == regionType && stamp.flag == true
     ).length;
+};
+
+export const isFlagByRegionType = (state, regionType) => {
+    regionStamps = state.stamps.filter(
+        (stamp) => stamp.regionType == regionType
+    );
+    regionStamps.forEach((stamp) => {
+        if (!stamp.flag) return false;
+    });
+    return state.stamps.filter((stamp) => stamp.regionType == regionType);
 };
 
 export default stampSlice.reducer;
