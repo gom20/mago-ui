@@ -1,13 +1,15 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import RegionComponent from '../../components/stamp/RegionComponent';
-import { getStamps } from '../../slices/stampSlice';
+import { getStamps, selectStampCount } from '../../slices/stampSlice';
 
 function StampMainScreen() {
     const dispatch = useDispatch();
     const navigation = useNavigation();
+    const stamps = useSelector((state) => state.stamp.stamps);
+    const flagCount = useSelector((state) => selectStampCount(state.stamp));
 
     const [seoulGeonggiColor, setSeoulGeonggiColor] = useState('#E1F7CB');
 
@@ -55,10 +57,10 @@ function StampMainScreen() {
                             fontWeight: '600',
                         }}
                     >
-                        10
+                        {flagCount}
                     </Text>
                 </View>
-                <Text style={styles.totalCount}> / 100</Text>
+                <Text style={styles.totalCount}> / {stamps.length}</Text>
             </View>
 
             <View style={styles.mapContainer}>

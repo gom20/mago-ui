@@ -4,7 +4,10 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import MountainComponent from '../../components/stamp/MountainComponent';
 import RegionComponent from '../../components/stamp/RegionComponent';
-import { selectStampsByRegionType } from '../../slices/stampSlice';
+import {
+    selectFlagCountByRegionType,
+    selectStampsByRegionType,
+} from '../../slices/stampSlice';
 
 function StampDetailScreen({ route }) {
     const dispatch = useDispatch();
@@ -13,6 +16,10 @@ function StampDetailScreen({ route }) {
     const StampsByRegion = useSelector((state) =>
         selectStampsByRegionType(state.stamp, regionType)
     );
+    const StampsByRegionCount = useSelector((state) =>
+        selectFlagCountByRegionType(state.stamp, regionType)
+    );
+
     useEffect(() => {
         console.log(StampsByRegion);
         // console.log(mountains);
@@ -34,19 +41,24 @@ function StampDetailScreen({ route }) {
                             fontWeight: '600',
                         }}
                     >
-                        10
+                        {StampsByRegionCount}
                     </Text>
                 </View>
-                <Text style={styles.totalCount}> / 100</Text>
+                <Text style={styles.totalCount}>
+                    {' '}
+                    / {StampsByRegion.length}
+                </Text>
             </View>
             <View style={styles.regionContainer}>
                 <View
-                    style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        // backgroundColor: 'red',
-                    }}
+                    style={
+                        {
+                            // position: 'absolute',
+                            // top: 0,
+                            // left: 0,
+                            // backgroundColor: 'red',
+                        }
+                    }
                 >
                     <RegionComponent
                         regionType={regionType}
@@ -61,19 +73,23 @@ function StampDetailScreen({ route }) {
                                 mountainName={stamp.mountainName}
                                 positionX={Number(stamp.positionX)}
                                 positionY={Number(stamp.positionY)}
+                                flag={stamp.flag}
                             ></MountainComponent>
                         );
                     })}
                 </View>
             </View>
+            <Text style={styles.footerText}>출처 : 산림청 선정 100대 명산</Text>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         backgroundColor: '#FFFFFF',
         paddingHorizontal: '5%',
+        justifyContent: 'space-between',
     },
     text: {
         fontSize: 25,
@@ -103,8 +119,15 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
     regionContainer: {
-        marginTop: '5%',
+        // marginTop: '5%',
         alignItems: 'center',
+        marginBottom: 20,
+    },
+    footerText: {
+        color: '#949494',
+        fontSize: 8,
+        alignSelf: 'flex-end',
+        marginBottom: 10,
     },
 });
 

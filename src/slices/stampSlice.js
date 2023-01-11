@@ -29,6 +29,8 @@ export const updateStamp = createAsyncThunk(
 
 const initialState = {
     stamps: [],
+    totalCount: 100,
+    totalFlagCount: 0,
 };
 
 const stampSlice = createSlice({
@@ -40,12 +42,30 @@ const stampSlice = createSlice({
                 state.stamps = action.payload.data;
             })
             .addCase(getStamps.rejected, (state, action) => {})
+            .addCase(updateStamp.fulfilled, (state, action) => {
+                mountainId = action.payload.data.mountainId;
+                flag = action.payload.data.flag;
+                state.stamps.find(
+                    (stamp) => stamp.mountainId == mountainId
+                ).flag = flag;
+            })
+            .addCase(updateStamp.rejected, (state, action) => {})
             .addDefaultCase((state, action) => {});
     },
 });
 
+export const selectStampCount = (state) => {
+    return state.stamps.filter((stamp) => stamp.flag == true).length;
+};
+
 export const selectStampsByRegionType = (state, regionType) => {
     return state.stamps.filter((stamp) => stamp.regionType == regionType);
+};
+
+export const selectFlagCountByRegionType = (state, regionType) => {
+    return state.stamps.filter(
+        (stamp) => stamp.regionType == regionType && stamp.flag == true
+    ).length;
 };
 
 export default stampSlice.reducer;
