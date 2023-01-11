@@ -1,18 +1,9 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useContext } from 'react';
-import {
-    Image,
-    ImageBackground,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
-} from 'react-native';
+import React from 'react';
+import { ImageBackground, StyleSheet, Text, View } from 'react-native';
 import CustomButton from '../../components/CustomButton';
-import { ModalContext } from '../../utils/ModalContext';
 
 const OnboardScreen = () => {
-    const { showModal } = useContext(ModalContext);
     const navigation = useNavigation();
 
     const onLoginPressed = () => {
@@ -23,7 +14,7 @@ const OnboardScreen = () => {
         navigation.navigate('SignUp');
     };
 
-    const onSocialLoginPressed = async () => {};
+    // const onSocialLoginPressed = async () => {};
 
     return (
         <View style={styles.container}>
@@ -50,7 +41,7 @@ const OnboardScreen = () => {
                         textColor="#0DD36E"
                     />
 
-                    <View style={styles.line} />
+                    {/* <View style={styles.line} />
 
                     <Text style={styles.smallText}> 간편하게 시작하기 </Text>
                     <Pressable
@@ -61,7 +52,7 @@ const OnboardScreen = () => {
                             style={styles.kakao}
                             source={require('../../assets/images/kakao-icon.png')}
                         />
-                    </Pressable>
+                    </Pressable> */}
                 </View>
             </ImageBackground>
         </View>
@@ -90,7 +81,6 @@ const styles = StyleSheet.create({
     headlineText: {
         color: '#FFFFFF',
         fontSize: 30,
-        // fontWeight: '300',
         fontFamily: 'Jalnan',
     },
     text: {
