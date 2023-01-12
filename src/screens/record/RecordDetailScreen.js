@@ -8,6 +8,8 @@ import { selectRecordById } from '../../slices/recordSlice';
 const RecordDetailScreen = ({ route }) => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
+    const [imageLoadError, setImageLoadError] = useState(false);
+
     const { recordId } = route.params;
     const record = useSelector((state) =>
         selectRecordById(state.record, recordId)
@@ -15,6 +17,7 @@ const RecordDetailScreen = ({ route }) => {
     const [snapshotUri, setSnapshotUri] = useState(null);
     useEffect(() => {
         setSnapshotUri(record.imgPath);
+
         const backAction = () => {
             navigation.navigate('RecordList');
             return true;
@@ -56,9 +59,15 @@ const RecordDetailScreen = ({ route }) => {
             <View style={styles.snapshotContainer}>
                 <Image
                     style={styles.snapshot}
-                    defaultSource={require('../../assets/images/mago_logo_green.png')}
-                    // source={require('../../assets/images/mago_logo_green.png')}
-                    source={{ uri: snapshotUri }}
+                    onError={(error) => {
+                        setImageLoadError(true);
+                    }}
+                    source={
+                        imageLoadError
+                            ? require('../../assets/images/record-detail-default.png')
+                            : { uri: snapshotUri }
+                    }
+                    resizeMode="cover"
                 />
             </View>
             <View style={styles.recordContainer}>
@@ -114,17 +123,19 @@ const RecordDetailScreen = ({ route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        // backgroundColor: '#FFFFFF',
         paddingLeft: '10%',
         paddingRight: '10%',
     },
     text: {
-        fontSize: 20,
-        fontWeight: '400',
+        marginTop: 10,
+        fontSize: 18,
+        fontWeight: '600',
         textAlign: 'center',
     },
     smallText: {
-        fontSize: 13,
+        fontSize: 12,
+        color: '#0DD36E',
     },
     boldText: {
         fontWeight: '600',
@@ -132,24 +143,29 @@ const styles = StyleSheet.create({
     summaryContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        borderWidth: 1,
+        // borderWidth: 1,
         borderRadius: 12,
         height: '12%',
         marginVertical: '5%',
         alignItems: 'center',
+        backgroundColor: '#FFF',
+        elevation: 1,
     },
     summaryItem: {
         alignItems: 'center',
     },
     snapshotContainer: {
         marginBottom: '5%',
+        // shadowColor: '#202020',
+        // shadowOffset: { width: 0, height: 0 },
+        // shadowRadius: 5,
     },
     snapshot: {
-        width: 300,
+        width: '100%',
         height: 200,
-        backgroundColor: 'red',
-        borderRadius: 20,
-        // elevation: 2,
+        // backgroundColor: 'red',
+        borderRadius: 10,
+        // elevation: 3,
     },
     recordContainer: {
         flexDirection: 'row',
@@ -158,13 +174,15 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
     },
     recordItem: {
-        borderWidth: 1,
+        // borderWidth: 1,
+        backgroundColor: '#FFF',
         borderRadius: 10,
         flex: 1,
         alignSelf: 'stretch',
         justifyContent: 'center',
         height: 70,
         alignItems: 'center',
+        elevation: 1,
     },
     recordItemLeft: {
         marginRight: '1%',

@@ -1,18 +1,15 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
+    Dimensions,
     ImageBackground,
-    KeyboardAvoidingView,
-    ScrollView,
     StyleSheet,
     Text,
     View,
 } from 'react-native';
 import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
+import mountains from '../../../mountains.json';
 import CustomButton from '../../components/CustomButton';
-import CustomInput from '../../components/CustomInput';
-import mountains from './../../../mountains.json';
 
 const HomeScreen = () => {
     const [mountainName, setMountainName] = useState('');
@@ -23,15 +20,11 @@ const HomeScreen = () => {
     };
 
     return (
-        <ImageBackground
-            source={require('../../assets/images/mountain_bg2.jpg')}
-            resizeMode="stretch"
-            style={styles.bg}
-        >
-            <KeyboardAvoidingView
-            // style={styles.container}
-            // enabled={false}
-            // keyboardVerticalOffset={20}
+        <View style={styles.container}>
+            <ImageBackground
+                source={require('../../assets/images/mountain_bg2.jpg')}
+                resizeMode="cover"
+                style={styles.bg}
             >
                 <View style={styles.contentContainer}>
                     <View style={styles.textContainer}>
@@ -44,19 +37,7 @@ const HomeScreen = () => {
                             마운틴고!
                         </Text>
                     </View>
-
-                    {/* <CustomInput
-                        placeholder="비밀번호"
-                        invalidText="비밀번호를 입력해 주세요."
-                        secureTextEntry
-                        maxLength={50}
-                        label="비밀번호"
-                    /> */}
                     <AutocompleteDropdown
-                        onFocus={() => {}}
-                        clearOnFocus={false}
-                        closeOnBlur={true}
-                        closeOnSubmit={false}
                         onSelectItem={(item) => {
                             if (item) {
                                 setMountainName(item.title);
@@ -68,9 +49,6 @@ const HomeScreen = () => {
                         onClear={() => {
                             setMountainName('');
                         }}
-                        onOpenSuggestionsList={() => {
-                            console.log('dropdownlist');
-                        }}
                         dataSet={mountains.data}
                         textInputProps={{
                             placeholder: '오늘의 산을 검색하세요.',
@@ -79,9 +57,8 @@ const HomeScreen = () => {
                             style: {
                                 height: 44,
                                 borderRadius: 25,
-                                backgroundColor: '#11ffee00',
+                                backgroundColor: '#FFFFFF',
                                 paddingLeft: 18,
-                                color: '#FFFFFF',
                             },
                         }}
                         rightButtonsContainerStyle={{
@@ -90,29 +67,27 @@ const HomeScreen = () => {
                             alignSelf: 'center',
                         }}
                         inputContainerStyle={{
-                            backgroundColor: '#11ffee00',
+                            backgroundColor: '#FFFFFF',
                             borderRadius: 25,
                             borderWidth: 1,
                             borderColor: '#BDBDBD',
                         }}
                         suggestionsListContainerStyle={{
-                            backgroundColor: '#11ffee00',
-                            borderWidth: 1,
-                            // width: '80%',
                             alignSelf: 'center',
+                            borderWidth: 1,
                             borderColor: '#BDBDBD',
-                            // borderRadius: 25,
-                            color: '#FFFFFF',
+                            borderRadius: 18,
+                            paddingHorizontal: 11,
                         }}
-                        suggestionsListTextStyle={{
-                            fontFamily: 'Jalnan',
-                            color: '#BDBDBD',
-                        }}
+                        suggestionsListTextStyle={{}}
                         inputHeight={45}
                         containerStyle={{ flexGrow: 1, flexShrink: 1 }}
                         renderItem={(item, text) => (
                             <Text style={{ padding: 15 }}>{item.title}</Text>
                         )}
+                        suggestionsListMaxHeight={
+                            Dimensions.get('window').height * 0.3
+                        }
                     />
                     <View style={styles.buttonContainer}>
                         <CustomButton
@@ -122,38 +97,27 @@ const HomeScreen = () => {
                         />
                     </View>
                 </View>
-            </KeyboardAvoidingView>
-        </ImageBackground>
+            </ImageBackground>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        // position: 'absolute',
-        // top: 0,
-        // left: 0,
-        // flex: 1,
-        // justifyContent: 'space-evenly',
-        // backgroundColor: '#FFFFFF',
-        backgroundColor: 'red',
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     bg: {
-        width: '100%',
-        height: '100%',
-
         position: 'absolute',
-        top: 0,
-        bottom: 0,
-        right: 0,
         left: 0,
-        // flex: 1,
-        // justifyContent: 'space-between',
-        // flexDirection: 'column',
+        top: 0,
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
     },
     contentContainer: {
         paddingLeft: '10%',
         paddingRight: '10%',
-        // backgroundColor: 'purple',
     },
     textContainer: {
         marginTop: '30%',
@@ -176,8 +140,8 @@ const styles = StyleSheet.create({
         color: '#BDBDBD',
     },
     buttonContainer: {
-        marginTop: '80%',
-        backgroundColor: 'red',
+        marginTop: '90%',
+        marginHorizontal: '1%',
     },
 });
 

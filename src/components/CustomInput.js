@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { back } from 'react-native/Libraries/Animated/Easing';
 
 const CustomInput = ({
     value,
@@ -12,11 +13,11 @@ const CustomInput = ({
     invalidFlag,
     invalidText,
     maxLength,
+    editable,
+    backgroundColor,
 }) => {
-    const [inputStyle, setInputStyle] = useState({
-        borderColor: '#000000',
-    });
     const [isPasswordSecure, setIsPasswordSecure] = useState(secureTextEntry);
+    const [inputStyle, setInputStyle] = useState({ borderColor: '#000000' });
 
     return (
         <View style={styles.container}>
@@ -27,7 +28,15 @@ const CustomInput = ({
                     onChangeText={setValue}
                     onChange={onChange}
                     placeholder={placeholder}
-                    style={[styles.input, inputStyle]}
+                    style={[
+                        styles.input,
+                        inputStyle,
+                        {
+                            backgroundColor: backgroundColor
+                                ? backgroundColor
+                                : '#FFF',
+                        },
+                    ]}
                     secureTextEntry={isPasswordSecure}
                     maxLength={maxLength ? maxLength : 50}
                     onEndEditing={(e) => {
@@ -36,6 +45,7 @@ const CustomInput = ({
                     autoCapitalize="none"
                     onFocus={() => setInputStyle({ borderColor: '#0DD36E' })}
                     onBlur={() => setInputStyle({ borderColor: '#000000' })}
+                    editable={editable}
                 />
                 {secureTextEntry && (
                     <MaterialCommunityIcons
@@ -85,7 +95,7 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         marginBottom: 5,
         borderWidth: 1,
-        // borderColor: '#000000',
+        color: '#000',
     },
     invalid: {
         fontSize: 12,

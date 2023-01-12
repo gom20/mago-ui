@@ -48,7 +48,10 @@ const MainTab = () => {
             <Tab.Screen
                 name="나의 산 기록"
                 component={RecordStack}
-                options={{ headerShown: false }}
+                options={{
+                    headerShown: false,
+                    // tabBarStyle: { display: 'none' },
+                }}
             />
             <Tab.Screen
                 name="도전 100대 명산"

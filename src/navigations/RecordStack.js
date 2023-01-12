@@ -13,18 +13,25 @@ const RecordStack = () => {
                 headerTitleAlign: 'center',
                 headerShown: true,
                 headerStyle: { elevation: 0 },
-                cardStyle: { backgroundColor: '#FFFFFF' },
+                // cardStyle: { backgroundColor: '#FFFFFF' },
             }}
         >
             <Stack.Screen
                 name="RecordList"
                 component={RecordListScreen}
-                options={{ headerTitle: '나의 산 기록' }}
+                options={{
+                    headerTitle: '나의 산 기록',
+                    headerTransparent: true,
+                    headerTintColor: '#FFF',
+                }}
             />
             <Stack.Screen
                 name="RecordDetail"
                 component={RecordDetailScreen}
-                options={{ headerTitle: '기록 상세 보기' }}
+                options={{
+                    headerTitle: '오늘의 기록',
+                    // backgroundColor: '#BDBDBD',
+                }}
             />
         </Stack.Navigator>
     );
