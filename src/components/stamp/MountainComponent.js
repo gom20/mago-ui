@@ -1,6 +1,8 @@
+import { useContext } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { updateStamp } from '../../slices/stampSlice';
+import { ModalContext } from '../../utils/ModalContext';
 
 const MountainComponent = ({
     mountainId,
@@ -11,8 +13,26 @@ const MountainComponent = ({
     onPressed,
 }) => {
     const dispatch = useDispatch();
-    const onMountainPressed = () => {
+
+    const { showModal } = useContext(ModalContext);
+
+    const onMountainPressed = async () => {
         console.log('pressed');
+
+        const confirmMessage = flag
+            ? '에서 깃발을 회수하시겠습니까?'
+            : '에 깃발을 꽂으시겠습니까?';
+        const confirmButtonText = flag ? '네! 회수하기' : '네! 깃발꽂기';
+        const response = await showModal({
+            async: true,
+            type: 'confirm',
+            message: mountainName + confirmMessage,
+            buttonTexts: ['아니오', confirmButtonText],
+        });
+
+        // 아니오 버튼 클릭
+        if (response) return;
+
         dispatch(
             updateStamp({
                 mountainId: mountainId,

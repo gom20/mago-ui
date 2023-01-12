@@ -112,10 +112,10 @@ function StampMainScreen() {
                 duration={6000}
                 confettiCount={30}
             />
-            <Text style={styles.text}>도전! 스탬프찍기!</Text>
+            <Text style={styles.text}>정상에 깃발꽂기!</Text>
             <Text style={styles.smallText}>
-                100대 명산 얼마나 가봤나요?{'\n'}지금까지 가본 산에 스탬프를
-                찍어보세요.
+                100대 명산 얼마나 가봤나요?{'\n'}
+                지금까지 가본 산에 깃발을 꽂아보세요.
             </Text>
             <View style={styles.countContainer}>
                 <View style={styles.stampCount}>

@@ -13,7 +13,7 @@ const RecordStack = () => {
                 headerTitleAlign: 'center',
                 headerShown: true,
                 headerStyle: { elevation: 0 },
-                // cardStyle: { backgroundColor: '#FFFFFF' },
+                cardStyle: { backgroundColor: '#FFFFFF' },
             }}
         >
             <Stack.Screen
@@ -30,7 +30,6 @@ const RecordStack = () => {
                 component={RecordDetailScreen}
                 options={{
                     headerTitle: '오늘의 기록',
-                    // backgroundColor: '#BDBDBD',
                 }}
             />
         </Stack.Navigator>

@@ -110,8 +110,18 @@ function RecordListScreen() {
 
     const renderEmptyComponent = () => {
         return (
-            <View>
-                <Text>아무것도 없어용.</Text>
+            <View
+                style={{
+                    marginVertical: '30%',
+                    alignSelf: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                <Image
+                    source={require('../../assets/images/no-data.png')}
+                    resizeMethod="resize"
+                    resizeMode="contain"
+                ></Image>
             </View>
         );
     };
@@ -174,6 +184,7 @@ const styles = StyleSheet.create({
     },
     scrollContainer: {
         // height: '100%',
+        // justifyContent: 'center',
         backgroundColor: '#FFF',
     },
     imageContainer: {
@@ -191,14 +202,14 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: '7%',
         borderBottomWidth: 1,
-        borderBottomColor: '#BDBDBD',
+        borderBottomColor: '#EEEEEE',
         backgroundColor: '#FFF',
         // elevation: 2,
     },
     itemContainer: {
         height: 55,
         borderBottomWidth: 1,
-        borderBottomColor: '#BDBDBD',
+        borderBottomColor: '#EEEEEE',
     },
     item: {
         paddingHorizontal: '7%',

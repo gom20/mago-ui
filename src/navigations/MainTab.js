@@ -26,9 +26,9 @@ const MainTab = () => {
                     } else if (route.name === '나의 산 기록') {
                         iconName = 'calendar-check';
                     } else if (route.name === '도전 100대 명산') {
-                        iconName = 'hiking';
+                        iconName = 'flag-variant';
                     } else if (route.name === '마이') {
-                        iconName = 'account';
+                        iconName = 'account-circle';
                     }
                     return (
                         <MaterialCommunityIcons
