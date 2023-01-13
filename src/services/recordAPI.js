@@ -12,9 +12,20 @@ const getRecords = (request) => {
     });
 };
 
+const deleteRecords = (request) => {
+    return api
+        .delete('records', {
+            data: request,
+        })
+        .then((response) => {
+            return response;
+        });
+};
+
 const recordAPI = {
     createRecord: createRecord,
     getRecords: getRecords,
+    deleteRecords: deleteRecords,
 };
 
 export default recordAPI;

@@ -1,9 +1,8 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
-import AccountScreen from '../screens/account/AccountScreen';
-import RecordListScreen from '../screens/record/RecordListScreen';
 import HomeScreen from '../screens/hiking/HomeScreens';
+import AccountStack from './AccountStack';
 import RecordStack from './RecordStack';
 import StampStack from './StampStack';
 
@@ -60,7 +59,7 @@ const MainTab = () => {
             />
             <Tab.Screen
                 name="마이"
-                component={AccountScreen}
+                component={AccountStack}
                 options={{ headerShown: false }}
             />
         </Tab.Navigator>

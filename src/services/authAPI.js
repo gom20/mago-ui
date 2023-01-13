@@ -30,12 +30,26 @@ const refreshToken = (request) => {
     });
 };
 
+const changePassword = (request) => {
+    return api.post('auth/changePassword', request).then(async (response) => {
+        response;
+    });
+};
+
+const withdraw = (request) => {
+    return api.post('auth/withdraw', request).then(async (response) => {
+        response;
+    });
+};
+
 const authAPI = {
     signup,
     login,
     logout,
     sendPassword,
     refreshToken,
+    changePassword,
+    withdraw,
 };
 
 export default authAPI;

@@ -1,75 +1,18 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import recordAPI from '../services/recordAPI';
-
-const parseDatetime = (startDatetime, endDatetime) => {
-    const WEEKDAY = [
-        '일요일',
-        '월요일',
-        '화요일',
-        '수요일',
-        '목요일',
-        '금요일',
-        '토요일',
-    ];
-    const startDate = new Date(startDatetime);
-    const year = startDate.getFullYear();
-    const month = startDate.getMonth() + 1;
-    const date = startDate.getDate();
-    const weekday = WEEKDAY[startDate.getDay()];
-
-    const endDate = new Date(endDatetime);
-    const secondDiff = Math.abs(endDate - startDate) / 1000;
-    const totalMinute = Math.ceil((secondDiff % 3600) / 60);
-    let totalHour = Math.round(secondDiff / 3600);
-
-    let startHour = startDate.getHours();
-    startHour = startHour % 12 ? startHour % 12 : 12;
-    const startAmpm = startHour >= 12 ? '오후' : '오전';
-    const startMinute = startDate.getMinutes();
-
-    let endHour = endDate.getHours();
-    endHour = endHour % 12 ? endHour % 12 : 12;
-    const endAmpm = startHour >= 12 ? '오후' : '오전';
-    const endMinute = endDate.getMinutes();
-
-    return {
-        year: year,
-        month: month,
-        date: date,
-        weekday: weekday,
-        totalHour: totalHour,
-        totalMinute: totalMinute,
-        startHour: startHour,
-        startMinute: startMinute,
-        startAmpm: startAmpm,
-        endHour: endHour,
-        endMinute: endMinute,
-        endAmpm: endAmpm,
-    };
-};
-
-const groupBy = (objectArray, property) => {
-    return objectArray.reduce((acc, obj) => {
-        const key = obj[property];
-        if (!acc[key]) {
-            acc[key] = [];
-        }
-        // Add object to list for given key's value
-        acc[key].push(obj);
-        return acc;
-    }, {});
-};
+import util from '../utils/util';
 
 export const createRecord = createAsyncThunk(
     'record/createRecord',
     async (request, thunkAPI) => {
         try {
             const response = await recordAPI.createRecord(request);
-            console.error(response);
-            response.data.dateTime = parseDatetime(
+            response.data.dateTime = util.parseDatetime(
                 response.data.startDatetime,
                 response.data.endDatetime
             );
+            response.data.groupId =
+                response.data.dateTime.year + '' + response.data.dateTime.month;
             return response;
         } catch (error) {
             console.error(error);
@@ -80,26 +23,30 @@ export const createRecord = createAsyncThunk(
 
 export const getRecords = createAsyncThunk(
     'record/getRecords',
-    async (request, thunkAPI) => {
+    async (params, thunkAPI) => {
         try {
-            const response = await recordAPI.getRecords(request);
-            response.data.forEach((item) => {
-                item.dateTime = parseDatetime(
+            const response = await recordAPI.getRecords({ params });
+            response.data.content.forEach((item) => {
+                item.dateTime = util.parseDatetime(
                     item.startDatetime,
                     item.endDatetime
                 );
                 item.groupId = item.dateTime.year + '' + item.dateTime.month;
+                item.selected = false;
             });
+            return response;
+        } catch (error) {
+            console.error(error);
+            return thunkAPI.rejectWithValue();
+        }
+    }
+);
 
-            const groupingData = groupBy(response.data, 'groupId');
-            let result = [];
-            Object.entries(groupingData).forEach(([key, value]) => {
-                result.push({
-                    groupId: key,
-                    groupData: value,
-                });
-            });
-            response.recordsByMonth = result;
+export const deleteRecords = createAsyncThunk(
+    'record/deleteRecords',
+    async (request, thunkAPI) => {
+        try {
+            const response = await recordAPI.deleteRecords(request);
             return response;
         } catch (error) {
             console.error(error);
@@ -111,31 +58,103 @@ export const getRecords = createAsyncThunk(
 const initialState = {
     records: [],
     recordsByMonth: [],
+    totalElements: 0,
+    pageNumber: 0,
+    last: true,
 };
 
 const recordSlice = createSlice({
     name: 'record',
     initialState,
+    reducers: {
+        reset(state) {
+            Object.assign(state, initialState);
+        },
+        select(state, action) {
+            //             var found = obj.find(e => e.name === 'John');
+            // console.log(found);
+
+            console.log(action.payload);
+            // records.find((record) => record.uid)
+
+            state.records.map((record) => {
+                if (record.uid == action.payload.uid) {
+                    record.selected = action.payload.selected;
+                    console.log(record);
+                }
+            });
+            Object.assign(state, state);
+            // record.selected = action.payload.selected;
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(createRecord.fulfilled, (state, action) => {
-                state.records = state.records.concat(action.payload.data);
-                state.recordsByMonth.forEach((group) => {
-                    if (group.groupId == action.payload.data.groupId) {
-                        group.grouData.push(action.payload.data);
-                    }
-                });
+                const data = action.payload.data;
+                state.records = [data].concat(state.records);
+                if (state.recordsByMonth[0].groupId == data.groupId) {
+                    state.recordsByMonth[0].groupData.unshift(data);
+                } else {
+                    state.recordsByMonth.unshift({
+                        groupId: data.groupId,
+                        groupData: data,
+                    });
+                }
             })
             .addCase(createRecord.rejected, (state, action) => {
                 // state.record = {};
             })
             .addCase(getRecords.fulfilled, (state, action) => {
-                state.records = action.payload.data;
-                state.recordsByMonth = action.payload.recordsByMonth;
+                const data = action.payload.data;
+                state.records = state.records
+                    .concat(data.content)
+                    .filter(
+                        (value, index, self) =>
+                            index === self.findIndex((o) => o.uid === value.uid)
+                    );
+
+                let recordsByMonth = [];
+                Object.entries(util.groupBy(state.records, 'groupId')).forEach(
+                    ([key, value]) => {
+                        recordsByMonth.push({
+                            groupId: key,
+                            groupData: value,
+                        });
+                    }
+                );
+                state.recordsByMonth = recordsByMonth;
+                state.totalElements = data.totalElements;
+                state.pageNumber =
+                    state.pageNumber <= data.pageable.pageNumber
+                        ? data.pageable.pageNumber
+                        : state.pageNumber;
+
+                state.last =
+                    state.pageNumber <= data.pageable.pageNumber
+                        ? data.last
+                        : state.last;
             })
             .addCase(getRecords.rejected, (state, action) => {
-                state.records = [];
+                // state.records = [];
             })
+            .addCase(deleteRecords.fulfilled, (state, action) => {
+                const data = action.payload.data;
+                state.records = state.records.filter(
+                    (record) => !data.ids.includes(record.uid)
+                );
+                let recordsByMonth = [];
+                Object.entries(util.groupBy(state.records, 'groupId')).forEach(
+                    ([key, value]) => {
+                        recordsByMonth.push({
+                            groupId: key,
+                            groupData: value,
+                        });
+                    }
+                );
+                state.recordsByMonth = recordsByMonth;
+                state.totalElements = state.totalElements - data.ids.length;
+            })
+            .addCase(deleteRecords.rejected, (state, action) => {})
             .addDefaultCase((state, action) => {});
     },
 });
@@ -146,4 +165,5 @@ export const selectRecordById = (state, recordId) => {
     return state.records.find((record) => record.uid == recordId);
 };
 
+export const { reset, select } = recordSlice.actions;
 export default recordSlice.reducer;

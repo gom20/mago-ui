@@ -22,7 +22,9 @@ export default function AppLayout() {
                 if (accessToken) {
                     config.headers.Authorization = accessToken;
                 }
+                console.log(config.request);
                 config.request = JSON.stringify(config.request);
+                console.log(config.request);
                 return config;
             },
             function (error) {

@@ -1,47 +1,110 @@
-import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
+    BackHandler,
     FlatList,
     Image,
-    ScrollView,
+    Pressable,
     StyleSheet,
     Text,
     TouchableHighlight,
     View,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { getRecords } from '../../slices/recordSlice';
+import {
+    deleteRecords,
+    getRecords,
+    reset,
+    select,
+} from '../../slices/recordSlice';
+import { ModalContext } from '../../utils/ModalContext';
 
 function RecordListScreen() {
     const dispatch = useDispatch();
     const recordsByMonth = useSelector((state) => state.record.recordsByMonth);
+    const records = useSelector((state) => state.record.records);
     const navigation = useNavigation();
 
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [deleteMode, setDeleteMode] = useState(false);
-    const [offset, setOffset] = useState(0);
+    const [itemsToDelete, setItemsToDelete] = useState([]);
+    const { showModal } = useContext(ModalContext);
 
     const onItemPressed = (row) => {
-        navigation.navigate('RecordDetail', { recordId: row.uid });
+        console.log(itemsToDelete.length);
+        console.log(itemsToDelete);
+        console.log('onItemPressed');
+        if (!deleteMode) {
+            navigation.navigate('RecordDetail', { recordId: row.uid });
+        } else {
+            if (itemsToDelete.includes(row.uid)) {
+                setItemsToDelete(
+                    itemsToDelete.filter((uid) => uid !== row.uid)
+                );
+            } else {
+                setItemsToDelete(itemsToDelete.concat([row.uid]));
+            }
+        }
+    };
+
+    const activateDeleteMode = (row) => {
+        setDeleteMode(true);
+        setItemsToDelete(itemsToDelete.concat([row.uid]));
+    };
+
+    const inactivateDeleteMode = () => {
+        setDeleteMode(false);
+        setItemsToDelete([]);
+    };
+
+    const onSelectAll = () => {
+        setItemsToDelete(records.map((record) => record.uid));
     };
 
     const onItemLongPressed = (row) => {
         console.log('longPressed');
-        // if (!deleteMode) {
-        setDeleteMode(true);
-        // console.log(deleteMode);
-        // }
+        if (!deleteMode) {
+            activateDeleteMode(row);
+        }
+    };
+
+    const onDeleteRecords = async () => {
+        const response = await showModal({
+            async: true,
+            type: 'confirm',
+            message: itemsToDelete.length + ' 개 항목을 삭제하시겠습니까?',
+            buttonTexts: ['아니오', '네'],
+        });
+
+        if (response) return;
+        dispatch(deleteRecords({ ids: itemsToDelete }))
+            .unwrap()
+            .then((response) => {
+                inactivateDeleteMode();
+            })
+            .catch((error) => {
+                console.error(error);
+            });
     };
 
     const renderItem = ({ item }) => {
-        let items = [];
+        let renderItems = [];
         if (item.groupData) {
-            items = item.groupData.map((row) => {
+            renderItems = item.groupData.map((row) => {
                 return (
                     <TouchableHighlight
                         key={row.uid}
-                        style={styles.itemContainer}
+                        style={[
+                            styles.itemContainer,
+                            {
+                                backgroundColor:
+                                    deleteMode &&
+                                    itemsToDelete.includes(row.uid)
+                                        ? '#FFC0CB'
+                                        : '#fff',
+                            },
+                        ]}
                         activeOpacity={0.8}
                         underlayColor="#DBDBDB"
                         onPress={() => onItemPressed(row)}
@@ -54,7 +117,6 @@ function RecordListScreen() {
                                     justifyContent: 'center',
                                     alignItems: 'center',
                                     width: '20%',
-                                    // backgroundColor: 'red',
                                 }}
                             >
                                 <Text style={styles.text}>
@@ -67,7 +129,6 @@ function RecordListScreen() {
                                     justifyContent: 'center',
                                     alignItems: 'center',
                                     width: '30%',
-                                    // backgroundColor: 'red',
                                 }}
                             >
                                 <Text style={styles.text}> {row.mountain}</Text>
@@ -79,7 +140,6 @@ function RecordListScreen() {
                                     justifyContent: 'flex-start',
                                     alignItems: 'center',
                                     width: '30%',
-                                    // backgroundColor: 'red',
                                 }}
                             >
                                 <MaterialIcons
@@ -103,7 +163,7 @@ function RecordListScreen() {
                 <Text style={styles.groupTitle}>
                     {item.groupId.substr(0, 4)}년 {item.groupId.substr(4, 2)}월
                 </Text>
-                <View>{items}</View>
+                <View>{renderItems}</View>
             </View>
         );
     };
@@ -126,9 +186,22 @@ function RecordListScreen() {
         );
     };
 
-    const fetchData = () => {
+    const currentPage = useSelector((state) => state.record.pageNumber);
+    const last = useSelector((state) => state.record.last);
+    const onEndReached = () => {
+        if (last) return;
+        fetchData({ page: currentPage + 1 });
+    };
+
+    const onRefresh = () => {
+        // dispatch(reset());
+        fetchData({ page: 0 });
+    };
+
+    const fetchData = (request) => {
+        if (deleteMode) return;
         setIsRefreshing(true);
-        dispatch(getRecords())
+        dispatch(getRecords(request))
             .unwrap()
             .then((response) => {
                 setIsRefreshing(false);
@@ -141,7 +214,64 @@ function RecordListScreen() {
     const extractKey = ({ groupData }) => groupData;
 
     useEffect(() => {
-        fetchData();
+        if (deleteMode) {
+            navigation.setOptions({
+                headerTitle: '',
+                headerRight: () => (
+                    <View style={{ flexDirection: 'row' }}>
+                        <Pressable
+                            onPress={onDeleteRecords}
+                            style={{
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                padding: 10,
+                            }}
+                        >
+                            <FontAwesome name="trash" size={18} color="#FFF" />
+                            <Text style={{ fontSize: 10, color: '#FFF' }}>
+                                삭제
+                            </Text>
+                        </Pressable>
+                        <Pressable
+                            onPress={onSelectAll}
+                            style={{
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                padding: 10,
+                            }}
+                        >
+                            <FontAwesome name="check" size={18} color="#FFF" />
+                            <Text style={{ fontSize: 10, color: '#FFF' }}>
+                                전체
+                            </Text>
+                        </Pressable>
+                    </View>
+                ),
+            });
+        } else {
+            navigation.setOptions({
+                headerTitle: '나의 산 기록',
+                headerRight: () => <></>,
+            });
+        }
+    }, [deleteMode, itemsToDelete]);
+
+    useEffect(() => {
+        const backAction = () => {
+            if (deleteMode) {
+                inactivateDeleteMode();
+                return true;
+            }
+        };
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            backAction
+        );
+        return () => backHandler.remove();
+    }, [deleteMode]);
+
+    useEffect(() => {
+        fetchData({ page: 0 });
     }, []);
 
     return (
@@ -163,16 +293,16 @@ function RecordListScreen() {
                     </Text>
                 </View>
             </View>
-            <ScrollView style={styles.scrollContainer}>
-                <FlatList
-                    data={recordsByMonth}
-                    renderItem={renderItem}
-                    keyExtractor={extractKey}
-                    ListEmptyComponent={renderEmptyComponent}
-                    onRefresh={fetchData}
-                    refreshing={isRefreshing}
-                />
-            </ScrollView>
+            <FlatList
+                data={recordsByMonth}
+                renderItem={renderItem}
+                keyExtractor={extractKey}
+                ListEmptyComponent={renderEmptyComponent}
+                onRefresh={onRefresh}
+                refreshing={isRefreshing}
+                onEndReached={onEndReached}
+                // onEndReachedThreshold={0.8}
+            />
         </View>
     );
 }
@@ -181,11 +311,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         // backgroundColor: 'red',
-    },
-    scrollContainer: {
-        // height: '100%',
-        // justifyContent: 'center',
-        backgroundColor: '#FFF',
     },
     imageContainer: {
         width: '100%',

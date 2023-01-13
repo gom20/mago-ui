@@ -67,6 +67,31 @@ export const refreshToken = createAsyncThunk(
     }
 );
 
+export const changePassword = createAsyncThunk(
+    'auth/changePassword',
+    async (request, thunkAPI) => {
+        try {
+            const response = await authAPI.changePassword(request);
+            return response;
+        } catch (error) {
+            return thunkAPI.rejectWithValue();
+        }
+    }
+);
+
+export const withdraw = createAsyncThunk(
+    'auth/withdraw',
+    async (request, thunkAPI) => {
+        try {
+            const response = await authAPI.withdraw(request);
+            return response;
+        } catch (error) {
+            console.error(error);
+            return thunkAPI.rejectWithValue();
+        }
+    }
+);
+
 const initialState = {
     isLogged: false,
     accessToken: null,
@@ -120,6 +145,18 @@ const authSlice = createSlice({
                 state.tokenExp = action.payload.data.tokenExp;
             })
             .addCase(refreshToken.rejected, (state, action) => {
+                state.accessToken = null;
+                state.refreshToken = null;
+                state.tokenExp = null;
+            })
+            .addCase(withdraw.fulfilled, (state, action) => {
+                state.user = null;
+                state.accessToken = null;
+                state.refreshToken = null;
+                state.tokenExp = null;
+            })
+            .addCase(withdraw.rejected, (state, action) => {
+                state.user = null;
                 state.accessToken = null;
                 state.refreshToken = null;
                 state.tokenExp = null;
