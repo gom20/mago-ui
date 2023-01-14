@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import { useDispatch } from 'react-redux';
@@ -7,12 +7,11 @@ import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
 import { signup } from '../../slices/authSlice';
 
-const SignUpScreen = () => {
+const SignUpScreen = ({ route }) => {
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [emailError, setEmailError] = useState(false);
     const [nameError, setNameError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
     const [confirmPasswordError, setConfirmPasswordError] = useState(false);
@@ -23,19 +22,10 @@ const SignUpScreen = () => {
     const validateInputs = () => {
         let validFlag = true;
 
-        setEmail((email) => email.trim());
         setName((name) => name.trim());
         setPassword((password) => password.trim());
         setConfirmPassword((confirmPassword) => confirmPassword.trim());
 
-        const emailRegex =
-            /^(([^<>()\[\].,;:\s@"]+(\.[^<>()\[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
-        if (email && emailRegex.test(email)) {
-            setEmailError(false);
-        } else {
-            setEmailError(true);
-            validFlag = false;
-        }
         const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/;
         if (password && passwordRegex.test(password)) {
             setPasswordError(false);
@@ -76,6 +66,12 @@ const SignUpScreen = () => {
             .catch((error) => {});
     };
 
+    useEffect(() => {
+        if (route.params?.email) {
+            setEmail(route.params.email);
+        }
+    }, [route.params?.email]);
+
     return (
         <KeyboardAwareScrollView
             contentContainerStyle={styles.container}
@@ -90,8 +86,7 @@ const SignUpScreen = () => {
                     value={email}
                     setValue={setEmail}
                     placeholder="이메일"
-                    invalidFlag={emailError}
-                    invalidText="이메일을 입력해 주세요."
+                    editable={false}
                     maxLength={50}
                 />
                 <CustomInput

@@ -13,14 +13,14 @@ const login = (request) => {
 };
 
 const logout = (request) => {
-    return api.post('auth/logout', request).then(async (response) => {
-        response;
+    return api.post('auth/logout', request).then((response) => {
+        return response;
     });
 };
 
 const sendPassword = (request) => {
-    return api.post('auth/sendPassword', request).then(async (response) => {
-        response;
+    return api.post('auth/sendPassword', request).then((response) => {
+        return response;
     });
 };
 
@@ -31,15 +31,29 @@ const refreshToken = (request) => {
 };
 
 const changePassword = (request) => {
-    return api.post('auth/changePassword', request).then(async (response) => {
-        response;
+    return api.post('auth/changePassword', request).then((response) => {
+        return response;
     });
 };
 
 const withdraw = (request) => {
-    return api.post('auth/withdraw', request).then(async (response) => {
-        response;
+    return api.post('auth/withdraw', request).then((response) => {
+        return response;
     });
+};
+
+const sendAuthEmail = (request) => {
+    return api.post('auth/sendConfirmEmail', request).then((response) => {
+        return response;
+    });
+};
+
+const isEmailAthenticated = (params) => {
+    return api
+        .get('auth/isEmailAthenticated', { params: params })
+        .then((response) => {
+            return response;
+        });
 };
 
 const authAPI = {
@@ -50,6 +64,8 @@ const authAPI = {
     refreshToken,
     changePassword,
     withdraw,
+    sendAuthEmail,
+    isEmailAthenticated,
 };
 
 export default authAPI;

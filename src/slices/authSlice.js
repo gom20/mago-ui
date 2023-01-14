@@ -92,6 +92,32 @@ export const withdraw = createAsyncThunk(
     }
 );
 
+export const sendAuthEmail = createAsyncThunk(
+    'auth/sendAuthEmail',
+    async (request, thunkAPI) => {
+        try {
+            const response = await authAPI.sendAuthEmail(request);
+            return response;
+        } catch (error) {
+            console.error(error);
+            return thunkAPI.rejectWithValue();
+        }
+    }
+);
+
+export const isEmailAthenticated = createAsyncThunk(
+    'auth/withdraw',
+    async (request, thunkAPI) => {
+        try {
+            const response = await authAPI.isEmailAthenticated(request);
+            return response;
+        } catch (error) {
+            console.error(error);
+            return thunkAPI.rejectWithValue();
+        }
+    }
+);
+
 const initialState = {
     isLogged: false,
     accessToken: null,

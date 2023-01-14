@@ -11,10 +11,8 @@ const OnboardScreen = () => {
     };
 
     const onSignUpPressed = async (data) => {
-        navigation.navigate('SignUp');
+        navigation.navigate('AuthEmail');
     };
-
-    // const onSocialLoginPressed = async () => {};
 
     return (
         <View style={styles.container}>
@@ -40,19 +38,6 @@ const OnboardScreen = () => {
                         bgColor="#FFFFFF"
                         textColor="#0DD36E"
                     />
-
-                    {/* <View style={styles.line} />
-
-                    <Text style={styles.smallText}> 간편하게 시작하기 </Text>
-                    <Pressable
-                        onPress={onSocialLoginPressed}
-                        style={styles.circle}
-                    >
-                        <Image
-                            style={styles.kakao}
-                            source={require('../../assets/images/kakao-icon.png')}
-                        />
-                    </Pressable> */}
                 </View>
             </ImageBackground>
         </View>

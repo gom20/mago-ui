@@ -1,6 +1,7 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import { useSelector } from 'react-redux';
+import AuthEmailScreen from '../screens/auth/AuthEmailScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
 import OnboardScreen from '../screens/auth/OnboardScreen';
 import PasswordReset from '../screens/auth/PasswordResetScreen';
@@ -32,6 +33,15 @@ const AppStack = () => {
                 name="Login"
                 component={LoginScreen}
                 options={{ headerShown: true }}
+            />
+            <Stack.Screen
+                name="AuthEmail"
+                component={AuthEmailScreen}
+                options={{
+                    headerShown: true,
+                    headerTitle: '본인 인증',
+                    headerTitleAlign: 'center',
+                }}
             />
             <Stack.Screen
                 name="SignUp"
