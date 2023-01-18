@@ -3,19 +3,27 @@ import { useNavigation } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
 import React, { useContext, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import { useDispatch } from 'react-redux';
 import CustomButton from '../../components/CustomButton';
-import { changePassword, withdraw } from '../../slices/authSlice';
+import CustomInput from '../../components/CustomInput';
+import { withdraw } from '../../slices/authSlice';
 import { ModalContext } from '../../utils/ModalContext';
 
 const WithdrawScreen = () => {
-    const [isChecked, setChecked] = useState(false);
     const { showModal } = useContext(ModalContext);
     const dispatch = useDispatch();
     const navigation = useNavigation();
 
+    const [isChecked, setChecked] = useState(false);
+    const [password, setPassword] = useState('');
+
     const onSubmitPressed = () => {
-        dispatch(withdraw())
+        dispatch(
+            withdraw({
+                password: password,
+            })
+        )
             .unwrap()
             .then(async (response) => {
                 await showModal({
@@ -28,7 +36,12 @@ const WithdrawScreen = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <KeyboardAwareScrollView
+            contentContainerStyle={styles.container}
+            resetScrollToCoords={{ x: 0, y: 0 }}
+            scrollEnabled={false}
+            keyboardShouldPersistTaps={'handled'}
+        >
             <View>
                 <Text style={styles.text}>
                     탈퇴하기 전{'\n'}다시 한번 확인해 주세요.{' '}
@@ -40,7 +53,6 @@ const WithdrawScreen = () => {
                         flexDirection: 'row',
                         justifyContent: 'center',
                         padding: 10,
-                        // alignItems: 'center',
                     }}
                 >
                     <Entypo name="warning" size={20} color="black" />
@@ -49,8 +61,6 @@ const WithdrawScreen = () => {
                         불가능합니다.
                     </Text>
                 </View>
-            </View>
-            <View style={styles.buttonContainer}>
                 <View style={{ flexDirection: 'row' }}>
                     <Checkbox
                         value={isChecked}
@@ -61,14 +71,24 @@ const WithdrawScreen = () => {
                         안내 사항을 모두 확인하였으며, 이에 동의합니다.
                     </Text>
                 </View>
+            </View>
+            <View style={styles.buttonContainer}>
+                <CustomInput
+                    label="비밀번호"
+                    value={password}
+                    setValue={setPassword}
+                    placeholder="비밀번호"
+                    secureTextEntry={true}
+                    maxLength={20}
+                />
 
                 <CustomButton
                     onPress={onSubmitPressed}
                     text="탈퇴하기"
-                    disabled={!isChecked}
+                    disabled={!isChecked || !password}
                 />
             </View>
-        </View>
+        </KeyboardAwareScrollView>
     );
 };
 
@@ -87,7 +107,6 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         lineHeight: 29.3,
         marginBottom: '8%',
-        // alignSelf: 'center',
     },
     smallText: {
         fontSize: 13,

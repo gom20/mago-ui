@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
 import getEnvVars from '../environment';
 
 const BASE_URL = getEnvVars().apiDomain + '/api';

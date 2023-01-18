@@ -1,21 +1,18 @@
-import { AntDesign } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import React, { useContext, useEffect, useState } from 'react';
+import Constants from 'expo-constants';
+import React, { useContext, useEffect } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
-import { DeviceInfo } from 'react-native-web';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../slices/authSlice';
 import { ModalContext } from '../../utils/ModalContext';
-import Constants from 'expo-constants';
 
 const AccountScreen = () => {
-    const user = useSelector((state) => state.auth.user);
-
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const { showModal } = useContext(ModalContext);
+    const user = useSelector((state) => state.auth.user);
 
     const onLogoutPressed = async () => {
         const response = await showModal({
@@ -24,7 +21,7 @@ const AccountScreen = () => {
             async: true,
             buttonTexts: ['취소', '확인'],
         });
-        if (!response) {
+        if (response) {
             dispatch(logout())
                 .unwrap()
                 .then(async (response) => {
@@ -32,7 +29,7 @@ const AccountScreen = () => {
                         message: '로그아웃이 완료되었습니다.',
                         async: true,
                     });
-                    navigation.navigate('Onboard');
+                    navigation.reset({ routes: [{ name: 'Onboard' }] });
                 })
                 .catch((error) => {});
         } else {
@@ -41,7 +38,7 @@ const AccountScreen = () => {
     };
 
     const onPasswordChangePressed = () => {
-        navigation.navigate('PasswordChange');
+        navigation.navigate('UpdatePassword');
     };
 
     const onWithdrawPressed = () => {
@@ -59,7 +56,7 @@ const AccountScreen = () => {
                         padding: 10,
                     }}
                 >
-                    <AntDesign name="logout" size={18} color="black" />
+                    <MaterialIcons name="logout" size={20} color="black" />
                     <Text style={{ fontSize: 10 }}>로그아웃</Text>
                 </Pressable>
             ),

@@ -1,7 +1,7 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import AccountScreen from '../screens/account/AccountScreen';
-import PasswordChangeScreen from '../screens/account/PasswordChangeScreen';
+import UpdatePasswordScreen from '../screens/account/UpdatePasswordScreen';
 import WithdrawScreen from '../screens/account/WithdrawScreen';
 
 const Stack = createStackNavigator();
@@ -27,8 +27,8 @@ const AccountStack = () => {
                 }}
             />
             <Stack.Screen
-                name="PasswordChange"
-                component={PasswordChangeScreen}
+                name="UpdatePassword"
+                component={UpdatePasswordScreen}
                 options={{
                     headerTitle: '비밀번호 변경',
                 }}

@@ -1,5 +1,5 @@
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { BackHandler, Image, StyleSheet, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,18 +15,23 @@ const RecordDetailScreen = ({ route }) => {
         selectRecordById(state.record, recordId)
     );
     const [snapshotUri, setSnapshotUri] = useState(null);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const onBackPress = async () => {
+                navigation.navigate('RecordList');
+                return true;
+            };
+            const subscription = BackHandler.addEventListener(
+                'hardwareBackPress',
+                onBackPress
+            );
+            return () => subscription.remove();
+        }, [])
+    );
+
     useEffect(() => {
         setSnapshotUri(record.imgPath);
-
-        const backAction = () => {
-            navigation.navigate('RecordList');
-            return true;
-        };
-        const backHandler = BackHandler.addEventListener(
-            'hardwareBackPress',
-            backAction
-        );
-        return () => backHandler.remove();
     }, [record]);
 
     return (

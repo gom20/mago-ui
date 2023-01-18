@@ -11,7 +11,7 @@ const OnboardScreen = () => {
     };
 
     const onSignUpPressed = async (data) => {
-        navigation.navigate('AuthEmail');
+        navigation.navigate('VerifyEmail');
     };
 
     return (

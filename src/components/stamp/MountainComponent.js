@@ -31,7 +31,7 @@ const MountainComponent = ({
         });
 
         // 아니오 버튼 클릭
-        if (response) return;
+        if (!response) return;
 
         dispatch(
             updateStamp({

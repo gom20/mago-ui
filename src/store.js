@@ -1,19 +1,19 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import loadingReducer from './slices/loadingSlice';
-import messageReducer from './slices/messageSlice';
 import recordReducer from './slices/recordSlice';
 import stampReducer from './slices/stampSlice';
+import hikingReducer from './slices/hikingSlice';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { persistReducer, persistStore } from 'redux-persist';
 
 const reducers = combineReducers({
     auth: authReducer,
-    message: messageReducer,
     loading: loadingReducer,
     record: recordReducer,
     stamp: stampReducer,
+    hiking: hikingReducer,
 });
 
 const persistConfig = {

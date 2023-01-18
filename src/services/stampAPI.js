@@ -1,7 +1,7 @@
 import api from './api';
 
-const getStamps = (request) => {
-    return api.get('stamps', request).then((response) => {
+const getStamps = (params) => {
+    return api.get('stamps', { params: params }).then((response) => {
         return response;
     });
 };
@@ -13,8 +13,8 @@ const updateStamp = (request) => {
 };
 
 const stampAPI = {
-    getStamps: getStamps,
-    updateStamp: updateStamp,
+    getStamps,
+    updateStamp,
 };
 
 export default stampAPI;

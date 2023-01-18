@@ -33,7 +33,7 @@ export default () => {
     };
 
     const hideModal = (flag) => {
-        // resolve return: left button true, right button false
+        // resolve return: left button false, right button true
         setModalProps(initialState);
         if (resolveRef.current) {
             resolveRef.current(flag);

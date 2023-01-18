@@ -8,22 +8,22 @@ import CustomInput from '../../components/CustomInput';
 import { login } from '../../slices/authSlice';
 
 const LoginScreen = () => {
+    const dispatch = useDispatch();
+    const navigation = useNavigation();
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [emailError, setEmailError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
 
-    const dispatch = useDispatch();
-    const navigation = useNavigation();
+    const validateInputs = () => {
+        email ? setEmailError(false) : setEmailError(true);
+        password ? setPasswordError(false) : setPasswordError(true);
+        return email && password ? true : false;
+    };
 
     const onLoginPressed = async () => {
-        const _validateInputs = () => {
-            email ? setEmailError(false) : setEmailError(true);
-            password ? setPasswordError(false) : setPasswordError(true);
-            return email && password ? true : false;
-        };
-
-        if (!_validateInputs()) return;
+        if (!validateInputs()) return;
         dispatch(
             login({
                 email: email,
@@ -37,8 +37,8 @@ const LoginScreen = () => {
             .catch((error) => {});
     };
 
-    const onPasswordResetPressed = () => {
-        navigation.navigate('PasswordReset');
+    const onForgetPasswordPressed = () => {
+        navigation.navigate('SendTempPassword');
     };
 
     return (
@@ -70,7 +70,7 @@ const LoginScreen = () => {
                         maxLength={50}
                         label="비밀번호"
                     />
-                    <Pressable onPress={onPasswordResetPressed}>
+                    <Pressable onPress={onForgetPasswordPressed}>
                         <Text style={styles.smallText}>
                             비밀번호를 잊으셨나요?
                         </Text>

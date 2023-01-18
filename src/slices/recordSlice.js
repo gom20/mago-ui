@@ -92,7 +92,10 @@ const recordSlice = createSlice({
             .addCase(createRecord.fulfilled, (state, action) => {
                 const data = action.payload.data;
                 state.records = [data].concat(state.records);
-                if (state.recordsByMonth[0].groupId == data.groupId) {
+                if (
+                    state.recordsByMonth.length > 0 &&
+                    state.recordsByMonth[0].groupId == data.groupId
+                ) {
                     state.recordsByMonth[0].groupData.unshift(data);
                 } else {
                     state.recordsByMonth.unshift({

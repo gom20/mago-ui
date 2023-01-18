@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useEffect } from 'react';
 import { BackHandler, StyleSheet, Text, View } from 'react-native';
 import CustomButton from '../../components/CustomButton';
@@ -10,17 +10,21 @@ const SignUpSuccessScreen = () => {
         navigation.navigate('Onboard');
     };
 
-    useEffect(() => {
-        const backAction = () => {
-            navigation.navigate('Onboard');
-            return true;
-        };
-        const backHandler = BackHandler.addEventListener(
-            'hardwareBackPress',
-            backAction
-        );
-        return () => backHandler.remove();
-    }, []);
+    useFocusEffect(
+        React.useCallback(() => {
+            const onBackPress = async () => {
+                navigation.navigate('Onboard');
+                return true;
+            };
+
+            const subscription = BackHandler.addEventListener(
+                'hardwareBackPress',
+                onBackPress
+            );
+
+            return () => subscription.remove();
+        }, [])
+    );
 
     return (
         <View style={styles.container}>

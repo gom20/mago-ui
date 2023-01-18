@@ -1,25 +1,27 @@
 import {
     FontAwesome5,
-    Fontisto,
     MaterialCommunityIcons,
     MaterialIcons,
 } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import haversine from 'haversine';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { BackHandler, StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStopwatch } from 'react-timer-hook';
 import CustomButton from '../../components/CustomButton';
+import { hideLoading, showLoading } from '../../slices/loadingSlice';
 import { createRecord } from '../../slices/recordSlice';
 import { ModalContext } from '../../utils/ModalContext';
 
 export default HikingScreen = ({ route }) => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
+
+    const [gpsFixed, setGpsFixed] = useState(true);
 
     // Stop Watch
     const stopwatchOffset = new Date();
@@ -36,12 +38,14 @@ export default HikingScreen = ({ route }) => {
     const startedToggleButtonProps = {
         text: '일시정지',
         iconType: 'pause',
-        color: '#F5F5F5',
+        bgColor: '#F5F5F5',
+        color: '#000000',
     };
     const pausedToggleButtonProps = {
         text: '계속하기',
         iconType: 'play-arrow',
-        color: '#FEE500',
+        bgColor: '#000000',
+        color: '#FFFFFF',
     };
     const [toggleButtonProps, setToggleButtonProps] = useState(
         startedToggleButtonProps
@@ -58,6 +62,7 @@ export default HikingScreen = ({ route }) => {
         LONGITUDE_DELTA = 0.001;
 
     const [position, setPosition] = useState({
+        isShow: true,
         latitude: LATITUDE,
         longitude: LONGITUDE,
         altitude: ALTITUDE,
@@ -68,6 +73,18 @@ export default HikingScreen = ({ route }) => {
         prevLatLng: {},
     });
 
+    const [startPosition, setStartPosition] = useState({
+        isShow: true,
+        latitude: LATITUDE,
+        longitude: LONGITUDE,
+    });
+
+    const [finishPosition, setFinishPosition] = useState({
+        isShow: false,
+        latitude: LATITUDE,
+        longitude: LONGITUDE,
+    });
+
     //Hiking Record
     const [startDatetime, setStartDatetime] = useState(null);
     const user = useSelector((state) => state.auth.user);
@@ -76,7 +93,7 @@ export default HikingScreen = ({ route }) => {
     let mapViewRef = useRef();
 
     const onFinishPressed = async () => {
-        stopHiking();
+        adjustRegionForSnapshot();
         const tempMapViewRef = mapViewRef;
         const response = await showModal({
             message: '등산을 완료하겠습니까?',
@@ -84,14 +101,22 @@ export default HikingScreen = ({ route }) => {
             buttonTexts: ['취소', '완료'],
             async: true,
         });
-        if (response) {
-            startHiking();
+        if (!response) {
             return;
         }
 
+        setFinishPosition({
+            isShow: true,
+            latitude: position.latitude,
+            longitude: position.longitude,
+        });
+        setPosition({
+            ...position,
+            isShow: false,
+        });
+        stopHiking();
+
         const snapshot = tempMapViewRef.takeSnapshot({
-            width: 300,
-            height: 200,
             format: 'png',
             quality: 0.5,
             result: 'file',
@@ -116,6 +141,7 @@ export default HikingScreen = ({ route }) => {
                 )
                     .unwrap()
                     .then((response) => {
+                        console.log(response);
                         navigation.navigate('나의 산 기록', {
                             screen: 'RecordDetail',
                             params: {
@@ -126,8 +152,28 @@ export default HikingScreen = ({ route }) => {
             })
             .catch((error) => {
                 console.error(error);
-                console.error('실패');
             });
+    };
+
+    const adjustRegionForSnapshot = () => {
+        let coords = position.routeCoords;
+
+        let sumLat = coords.reduce((a, c) => {
+            return parseFloat(a) + parseFloat(c.latitude);
+        }, 0);
+        let sumLong = coords.reduce((a, c) => {
+            return parseFloat(a) + parseFloat(c.longitude);
+        }, 0);
+
+        let avgLat = sumLat / coords.length || 0;
+        let avgLong = sumLong / coords.length || 0;
+
+        mapViewRef.animateToRegion({
+            latitude: parseFloat(avgLat),
+            longitude: avgLong,
+            latitudeDelta: 0.001,
+            longitudeDelta: 0.001,
+        });
     };
 
     const onTogglePressed = () => {
@@ -138,8 +184,9 @@ export default HikingScreen = ({ route }) => {
         }
     };
 
-    const onMoveMapToCurrentRegion = () => {
+    const onGpsButtonPressed = () => {
         mapViewRef.animateToRegion(getMapRegion());
+        setGpsFixed(true);
     };
 
     const startHiking = () => {
@@ -157,9 +204,6 @@ export default HikingScreen = ({ route }) => {
         setIsRecordRunning(false);
     };
 
-    /**
-     * state값으로 MapRegion 객체 만들어서 리턴
-     */
     const getMapRegion = () => ({
         latitude: position.latitude,
         longitude: position.longitude,
@@ -167,26 +211,24 @@ export default HikingScreen = ({ route }) => {
         longitudeDelta: LONGITUDE_DELTA,
     });
 
-    /**
-     * 현재 위치로 state값 업데이트
-     */
-    const setCurrentPosition = async () => {
-        await Location.requestForegroundPermissionsAsync();
+    const setCurrentPosition = async (response) => {
         const {
             coords: { latitude, longitude, altitude },
-        } = await Location.getCurrentPositionAsync();
+        } = response;
         setPosition({
             ...position,
             latitude: latitude,
             longitude: longitude,
             altitude: altitude,
         });
+
+        setStartPosition({
+            isShow: true,
+            latitude: latitude,
+            longitude: longitude,
+        });
     };
 
-    /**
-     * 갱신된 위치로 state 값 업데이트
-     * @param {*} newPosition
-     */
     const setUpdatedPosition = (newPosition) => {
         const _calcDistance = (prevLatLng, newLatLng) => {
             return haversine(prevLatLng, newLatLng, { unit: 'meter' }) || 0;
@@ -201,6 +243,7 @@ export default HikingScreen = ({ route }) => {
 
         // 좌표값 갱신하기
         setPosition((prev) => ({
+            ...position,
             latitude,
             longitude,
             altitude,
@@ -212,10 +255,6 @@ export default HikingScreen = ({ route }) => {
         }));
     };
 
-    /**
-     * Background 위치 업데이트 시작
-     * @returns
-     */
     const startBackgroundPositionUpdate = async () => {
         const { granted } = await Location.getBackgroundPermissionsAsync();
         if (!granted) {
@@ -238,7 +277,7 @@ export default HikingScreen = ({ route }) => {
         }
 
         await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-            accuracy: Location.Accuracy.High,
+            accuracy: Location.Accuracy.Highest,
             showsBackgroundLocationIndicator: true,
             foregroundService: {
                 notificationTitle: 'Location',
@@ -248,9 +287,6 @@ export default HikingScreen = ({ route }) => {
         });
     };
 
-    /**
-     * Background 위치 업데이트 중단
-     */
     const stopBackgroundPositionUpdate = async () => {
         const hasStarted = await Location.hasStartedLocationUpdatesAsync(
             LOCATION_TASK_NAME
@@ -261,9 +297,6 @@ export default HikingScreen = ({ route }) => {
         }
     };
 
-    /**
-     * 위치 추적을 위한 백그라운드 태스크 정의
-     */
     TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
         if (error) {
             return;
@@ -278,6 +311,59 @@ export default HikingScreen = ({ route }) => {
         }
     });
 
+    const confirmBackAction = async () => {
+        const response = await showModal({
+            async: true,
+            message: '등산을 취소하시겠습니까?',
+            type: 'confirm',
+            buttonTexts: ['아니오', '네'],
+        });
+        console.log(response);
+        if (!response) return;
+        console.log(response);
+        navigation.navigate('MainTab');
+    };
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const onBackPress = async () => {
+                const response = await showModal({
+                    async: true,
+                    message: '등산을 취소하시겠습니까?',
+                    type: 'confirm',
+                    buttonTexts: ['아니오', '네'],
+                });
+                console.log(response);
+                if (!response) return;
+                console.log(response);
+                navigation.navigate('MainTab');
+            };
+
+            const subscription = BackHandler.addEventListener(
+                'hardwareBackPress',
+                onBackPress
+            );
+
+            return () => subscription.remove();
+        }, [])
+    );
+
+    useEffect(() => {
+        navigation.setOptions({
+            headerLeft: () => (
+                <MaterialIcons
+                    name="arrow-back"
+                    size={24}
+                    color="black"
+                    onPress={confirmBackAction}
+                    style={{
+                        marginLeft: '17%',
+                    }}
+                />
+            ),
+        });
+    }, [navigation]);
+
     useEffect(() => {
         const requestPermissions = async () => {
             const foreground =
@@ -290,13 +376,16 @@ export default HikingScreen = ({ route }) => {
             return false;
         };
 
-        // setLoading(true);
         requestPermissions()
             .then(async (granted) => {
                 if (granted) {
                     console.log('위치 권한 요청 허용');
-                    setCurrentPosition()
+                    dispatch(showLoading());
+                    Location.getCurrentPositionAsync()
                         .then((resp) => {
+                            console.log('현재 위치 로드 완료');
+                            setCurrentPosition(resp);
+                            dispatch(hideLoading());
                             startHiking();
                         })
                         .catch((error) => {
@@ -341,36 +430,81 @@ export default HikingScreen = ({ route }) => {
                 loadingEnabled
                 region={getMapRegion()}
                 style={styles.mapContainer}
+                onMapLoaded={() => console.log('MAP LOADED')}
+                onPress={() => console.log('On Press')}
+                onPanDrag={() => {
+                    if (gpsFixed) {
+                        setGpsFixed(false);
+                    }
+                }}
             >
-                <Marker.Animated
-                    ref={markerRef}
-                    coordinate={{
-                        latitude: position.latitude,
-                        longitude: position.longitude,
-                    }}
-                >
-                    <Fontisto name="map-marker-alt" size={24} color="#FF0000" />
-                </Marker.Animated>
+                {startPosition.isShow && (
+                    <Marker
+                        coordinate={{
+                            latitude: startPosition.latitude,
+                            longitude: startPosition.longitude,
+                        }}
+                        title="시작지점"
+                    ></Marker>
+                )}
+                {position.isShow && (
+                    <Marker.Animated
+                        ref={markerRef}
+                        coordinate={{
+                            latitude: position.latitude,
+                            longitude: position.longitude,
+                        }}
+                    >
+                        <MaterialIcons
+                            name="stop-circle"
+                            size={16}
+                            color="red"
+                            style={{
+                                width: 16,
+                                height: 16,
+                                borderRadius: 16 / 2,
+                                overflow: 'hidden',
+                                borderWidth: 3,
+                                borderColor: '#fff',
+                            }}
+                        />
+                    </Marker.Animated>
+                )}
+                {finishPosition.isShow && (
+                    <Marker
+                        coordinate={{
+                            latitude: finishPosition.latitude,
+                            longitude: finishPosition.longitude,
+                        }}
+                        title="종료지점"
+                    >
+                        <FontAwesome5
+                            name="flag-checkered"
+                            size={24}
+                            color="black"
+                        />
+                    </Marker>
+                )}
+
                 <Polyline
                     coordinates={position.routeCoords}
                     strokeWidth={5}
                     strokeColor="#FF0000"
                 />
             </MapView>
-            <View style={styles.myLocation}>
+            <View style={styles.gpsButton}>
                 <MaterialIcons
-                    name="gps-fixed"
-                    size={25}
-                    color="black"
-                    onPress={onMoveMapToCurrentRegion}
+                    name={gpsFixed ? 'gps-fixed' : 'gps-not-fixed'}
+                    size={23}
+                    color={gpsFixed ? '#0DD36E' : '#cef2e0'}
+                    onPress={onGpsButtonPressed}
                 />
             </View>
 
             <View style={styles.contentContainer}>
                 <View style={styles.timerContainer}>
                     <Text style={styles.timeText}>
-                        {hourTime}:{minuteTime}:{secondTime} (
-                        {position.routeCoords.length})
+                        {hourTime}:{minuteTime}:{secondTime}
                     </Text>
                 </View>
                 <View style={styles.recordContainer}>
@@ -408,8 +542,8 @@ export default HikingScreen = ({ route }) => {
                         onPress={onTogglePressed}
                         text={toggleButtonProps.text}
                         iconType={toggleButtonProps.iconType}
-                        bgColor={toggleButtonProps.color}
-                        textColor="#757575"
+                        bgColor={toggleButtonProps.bgColor}
+                        textColor={toggleButtonProps.color}
                         width={'40%'}
                         height={43}
                         fontSize={14}
@@ -435,17 +569,16 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     mapContainer: {
-        // flex: 1,
         width: '100%',
-        height: '71%',
+        height: '73%',
     },
-    myLocation: {
+    gpsButton: {
         position: 'absolute',
-        top: '62%',
+        top: '64%',
         right: '5%',
         width: 45,
         height: 45,
-        elevation: 2,
+        elevation: 4,
         borderRadius: 25,
         backgroundColor: '#ffffff',
         justifyContent: 'center',
@@ -453,7 +586,7 @@ const styles = StyleSheet.create({
     },
     contentContainer: {
         width: '100%',
-        height: '30%',
+        height: '28%',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',

@@ -1,5 +1,5 @@
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useContext, useEffect, useState } from 'react';
 import {
     BackHandler,
@@ -77,7 +77,7 @@ function RecordListScreen() {
             buttonTexts: ['아니오', '네'],
         });
 
-        if (response) return;
+        if (!response) return;
         dispatch(deleteRecords({ ids: itemsToDelete }))
             .unwrap()
             .then((response) => {
@@ -256,19 +256,23 @@ function RecordListScreen() {
         }
     }, [deleteMode, itemsToDelete]);
 
-    useEffect(() => {
-        const backAction = () => {
-            if (deleteMode) {
-                inactivateDeleteMode();
-                return true;
-            }
-        };
-        const backHandler = BackHandler.addEventListener(
-            'hardwareBackPress',
-            backAction
-        );
-        return () => backHandler.remove();
-    }, [deleteMode]);
+    useFocusEffect(
+        React.useCallback(() => {
+            const onBackPress = async () => {
+                if (deleteMode) {
+                    inactivateDeleteMode();
+                    return true;
+                } else {
+                    navigation.navigate('홈');
+                }
+            };
+            const subscription = BackHandler.addEventListener(
+                'hardwareBackPress',
+                onBackPress
+            );
+            return () => subscription.remove();
+        }, [deleteMode])
+    );
 
     useEffect(() => {
         fetchData({ page: 0 });

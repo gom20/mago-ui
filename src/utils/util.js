@@ -1,3 +1,5 @@
+import { Buffer } from 'buffer';
+
 const parseDatetime = (startDatetime, endDatetime) => {
     const WEEKDAY = [
         '일요일',
@@ -57,9 +59,14 @@ const groupBy = (objectArray, property) => {
     }, {});
 };
 
+const parseJwt = (token) => {
+    return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+};
+
 const util = {
     parseDatetime,
     groupBy,
+    parseJwt,
 };
 
 export default util;

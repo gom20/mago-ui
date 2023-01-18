@@ -11,10 +11,10 @@ const SignUpScreen = ({ route }) => {
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordConfirm, setPasswordConfirm] = useState('');
     const [nameError, setNameError] = useState(false);
     const [passwordError, setPasswordError] = useState(false);
-    const [confirmPasswordError, setConfirmPasswordError] = useState(false);
+    const [passwordConfirmError, SetPasswordConfirmError] = useState(false);
 
     const dispatch = useDispatch();
     const navigation = useNavigation();
@@ -24,7 +24,7 @@ const SignUpScreen = ({ route }) => {
 
         setName((name) => name.trim());
         setPassword((password) => password.trim());
-        setConfirmPassword((confirmPassword) => confirmPassword.trim());
+        setPasswordConfirm((passwordConfirm) => passwordConfirm.trim());
 
         const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$/;
         if (password && passwordRegex.test(password)) {
@@ -39,10 +39,10 @@ const SignUpScreen = ({ route }) => {
             setNameError(true);
             validFlag = false;
         }
-        if (confirmPassword && password === confirmPassword) {
-            setConfirmPasswordError(false);
+        if (passwordConfirm && password === passwordConfirm) {
+            SetPasswordConfirmError(false);
         } else {
-            setConfirmPasswordError(true);
+            SetPasswordConfirmError(true);
             validFlag = false;
         }
 
@@ -57,6 +57,7 @@ const SignUpScreen = ({ route }) => {
                 email: email,
                 name: name,
                 password: password,
+                passwordConfirm: passwordConfirm,
             })
         )
             .unwrap()
@@ -110,11 +111,11 @@ const SignUpScreen = ({ route }) => {
                 />
                 <CustomInput
                     label="비밀번호 확인"
-                    value={confirmPassword}
-                    setValue={setConfirmPassword}
+                    value={passwordConfirm}
+                    setValue={setPasswordConfirm}
                     placeholder="비밀번호 확인"
                     secureTextEntry={true}
-                    invalidFlag={confirmPasswordError}
+                    invalidFlag={passwordConfirmError}
                     invalidText="입력하신 비밀번호와 다릅니다."
                     maxLength={20}
                 />

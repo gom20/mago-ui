@@ -1,6 +1,7 @@
-import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import React, { useContext, useEffect, useState } from 'react';
 import {
+    BackHandler,
     Dimensions,
     ImageBackground,
     StyleSheet,
@@ -10,14 +11,39 @@ import {
 import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown';
 import mountains from '../../../mountains.json';
 import CustomButton from '../../components/CustomButton';
+import { ModalContext } from '../../utils/ModalContext';
 
 const HomeScreen = () => {
     const [mountainName, setMountainName] = useState('');
     const navigation = useNavigation();
+    const { showModal } = useContext(ModalContext);
 
     const onHikingPressed = () => {
         navigation.navigate('Hiking', { mountain: mountainName });
     };
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const onBackPress = async () => {
+                const response = await showModal({
+                    async: true,
+                    message: '앱을 종료하시겠습니까?',
+                    type: 'confirm',
+                    buttonTexts: ['아니오', '네'],
+                });
+                if (!response) return;
+                BackHandler.exitApp();
+                return true;
+            };
+
+            const subscription = BackHandler.addEventListener(
+                'hardwareBackPress',
+                onBackPress
+            );
+
+            return () => subscription.remove();
+        }, [])
+    );
 
     return (
         <View style={styles.container}>
@@ -70,12 +96,12 @@ const HomeScreen = () => {
                             backgroundColor: '#FFFFFF',
                             borderRadius: 25,
                             borderWidth: 1,
-                            borderColor: '#BDBDBD',
+                            borderColor: '#949494',
                         }}
                         suggestionsListContainerStyle={{
                             alignSelf: 'center',
                             borderWidth: 1,
-                            borderColor: '#BDBDBD',
+                            borderColor: '#949494',
                             borderRadius: 18,
                             paddingHorizontal: 11,
                         }}

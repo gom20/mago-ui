@@ -1,29 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import authAPI from '../services/authAPI';
-import { Buffer } from 'buffer';
+import memberAPI from '../services/memberAPI';
+import util from '../utils/util';
 
 export const signup = createAsyncThunk(
     'auth/signup',
     async (request, thunkAPI) => {
         try {
-            return await authAPI.signup(request);
-        } catch (error) {
-            return thunkAPI.rejectWithValue();
-        }
-    }
-);
-
-const parseJwt = (token) => {
-    return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
-};
-
-export const login = createAsyncThunk(
-    'auth/login',
-    async (request, thunkAPI) => {
-        try {
-            const response = await authAPI.login(request);
-            response.data.tokenExp = parseJwt(response.data.accessToken).exp;
-            return response;
+            return await memberAPI.signup(request);
         } catch (error) {
             console.error(error);
             return thunkAPI.rejectWithValue();
@@ -31,12 +15,53 @@ export const login = createAsyncThunk(
     }
 );
 
-export const sendPassword = createAsyncThunk(
-    'auth/sendPassword',
+export const withdraw = createAsyncThunk(
+    'auth/withdraw',
     async (request, thunkAPI) => {
         try {
-            return await authAPI.sendPassword(request);
+            return await memberAPI.withdraw(request);
         } catch (error) {
+            console.error(error);
+            return thunkAPI.rejectWithValue();
+        }
+    }
+);
+
+export const updatePassword = createAsyncThunk(
+    'auth/updatePassword',
+    async (request, thunkAPI) => {
+        try {
+            return await memberAPI.updatePassword(request);
+        } catch (error) {
+            console.error(error);
+            return thunkAPI.rejectWithValue();
+        }
+    }
+);
+
+export const sendTempPassword = createAsyncThunk(
+    'auth/sendTempPassword',
+    async (request, thunkAPI) => {
+        try {
+            return await memberAPI.sendTempPassword(request);
+        } catch (error) {
+            console.error(error);
+            return thunkAPI.rejectWithValue();
+        }
+    }
+);
+
+export const login = createAsyncThunk(
+    'auth/login',
+    async (request, thunkAPI) => {
+        try {
+            const response = await authAPI.login(request);
+            response.data.tokenExp = util.parseJwt(
+                response.data.accessToken
+            ).exp;
+            return response;
+        } catch (error) {
+            console.error(error);
             return thunkAPI.rejectWithValue();
         }
     }
@@ -49,41 +74,20 @@ export const logout = createAsyncThunk(
             const { accessToken, refreshToken } = thunkAPI.getState().auth;
             return await authAPI.logout({ accessToken, refreshToken });
         } catch (error) {
+            console.error(error);
             return thunkAPI.rejectWithValue();
         }
     }
 );
 
-export const refreshToken = createAsyncThunk(
-    'auth/refreshToken',
+export const refresh = createAsyncThunk(
+    'auth/refresh',
     async (request, thunkAPI) => {
         try {
             const response = await authAPI.refreshToken(request);
-            response.data.tokenExp = parseJwt(response.data.accessToken).exp;
-            return response;
-        } catch (error) {
-            return thunkAPI.rejectWithValue();
-        }
-    }
-);
-
-export const changePassword = createAsyncThunk(
-    'auth/changePassword',
-    async (request, thunkAPI) => {
-        try {
-            const response = await authAPI.changePassword(request);
-            return response;
-        } catch (error) {
-            return thunkAPI.rejectWithValue();
-        }
-    }
-);
-
-export const withdraw = createAsyncThunk(
-    'auth/withdraw',
-    async (request, thunkAPI) => {
-        try {
-            const response = await authAPI.withdraw(request);
+            response.data.tokenExp = util.parseJwt(
+                response.data.accessToken
+            ).exp;
             return response;
         } catch (error) {
             console.error(error);
@@ -92,12 +96,11 @@ export const withdraw = createAsyncThunk(
     }
 );
 
-export const sendAuthEmail = createAsyncThunk(
-    'auth/sendAuthEmail',
+export const sendVerificationEmail = createAsyncThunk(
+    'auth/sendVerificationEmail',
     async (request, thunkAPI) => {
         try {
-            const response = await authAPI.sendAuthEmail(request);
-            return response;
+            return await authAPI.sendVerificationEmail(request);
         } catch (error) {
             console.error(error);
             return thunkAPI.rejectWithValue();
@@ -105,12 +108,11 @@ export const sendAuthEmail = createAsyncThunk(
     }
 );
 
-export const isEmailAthenticated = createAsyncThunk(
-    'auth/withdraw',
+export const isVerifiedEmail = createAsyncThunk(
+    'auth/isVerifiedEmail',
     async (request, thunkAPI) => {
         try {
-            const response = await authAPI.isEmailAthenticated(request);
-            return response;
+            return await authAPI.isVerifiedEmail(request);
         } catch (error) {
             console.error(error);
             return thunkAPI.rejectWithValue();
@@ -119,7 +121,7 @@ export const isEmailAthenticated = createAsyncThunk(
 );
 
 const initialState = {
-    isLogged: false,
+    isLogin: false,
     accessToken: null,
     refreshToken: null,
     tokenExp: null,
@@ -131,62 +133,48 @@ const authSlice = createSlice({
     initialState,
     extraReducers: (builder) => {
         builder
-            .addCase(signup.fulfilled, (state, action) => {
-                state.isLogged = false;
-            })
-            .addCase(signup.rejected, (state, action) => {
-                state.isLogged = false;
-            })
             .addCase(login.fulfilled, (state, action) => {
-                state.isLogged = true;
+                state.isLogin = true;
                 state.accessToken = action.payload.data.accessToken;
                 state.refreshToken = action.payload.data.refreshToken;
                 state.tokenExp = action.payload.data.tokenExp;
                 state.user = action.payload.data.user;
             })
             .addCase(login.rejected, (state, action) => {
-                state.isLogged = false;
+                state.isLogin = false;
                 state.accessToken = null;
                 state.refreshToken = null;
                 state.tokenExp = null;
                 state.user = null;
             })
             .addCase(logout.fulfilled, (state, action) => {
-                state.isLogged = false;
+                state.isLogin = false;
                 state.accessToken = null;
                 state.refreshToken = null;
                 state.tokenExp = null;
                 state.user = null;
             })
             .addCase(logout.rejected, (state, action) => {
-                state.isLogged = false;
+                state.isLogin = false;
                 state.accessToken = null;
                 state.refreshToken = null;
                 state.tokenExp = null;
                 state.user = null;
             })
-            .addCase(refreshToken.fulfilled, (state, action) => {
+            .addCase(refresh.fulfilled, (state, action) => {
                 state.accessToken = action.payload.data.accessToken;
                 state.refreshToken = action.payload.data.refreshToken;
                 state.tokenExp = action.payload.data.tokenExp;
             })
-            .addCase(refreshToken.rejected, (state, action) => {
+            .addCase(refresh.rejected, (state, action) => {
                 state.accessToken = null;
                 state.refreshToken = null;
                 state.tokenExp = null;
             })
             .addCase(withdraw.fulfilled, (state, action) => {
-                state.user = null;
-                state.accessToken = null;
-                state.refreshToken = null;
-                state.tokenExp = null;
+                state = initialState;
             })
-            .addCase(withdraw.rejected, (state, action) => {
-                state.user = null;
-                state.accessToken = null;
-                state.refreshToken = null;
-                state.tokenExp = null;
-            })
+            .addCase(withdraw.rejected, (state, action) => {})
             .addDefaultCase((state, action) => {});
     },
 });

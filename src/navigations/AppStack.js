@@ -1,19 +1,19 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 import { useSelector } from 'react-redux';
-import AuthEmailScreen from '../screens/auth/AuthEmailScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
 import OnboardScreen from '../screens/auth/OnboardScreen';
-import PasswordReset from '../screens/auth/PasswordResetScreen';
+import SendTempPasswordScreen from '../screens/auth/SendTempPasswordScreen';
 import SignUpScreen from '../screens/auth/SignUpScreen';
 import SignUpSuccessScreen from '../screens/auth/SignUpSucessScreen';
+import VerifyEmailScreen from '../screens/auth/VerifyEmailScreen';
 import HomeStack from './HomeStack';
 
 const Stack = createStackNavigator();
 
 const AppStack = () => {
     const auth = useSelector((state) => state.auth);
-    const initScreen = auth.isLogged ? 'Home' : 'Onboard';
+    const initScreen = auth.isLogin ? 'Home' : 'Onboard';
 
     return (
         <Stack.Navigator
@@ -35,8 +35,8 @@ const AppStack = () => {
                 options={{ headerShown: true }}
             />
             <Stack.Screen
-                name="AuthEmail"
-                component={AuthEmailScreen}
+                name="VerifyEmail"
+                component={VerifyEmailScreen}
                 options={{
                     headerShown: true,
                     headerTitle: '본인 인증',
@@ -54,8 +54,8 @@ const AppStack = () => {
                 options={{ headerShown: false }}
             />
             <Stack.Screen
-                name="PasswordReset"
-                component={PasswordReset}
+                name="SendTempPassword"
+                component={SendTempPasswordScreen}
                 options={{ headerShown: true }}
             />
             <Stack.Screen
