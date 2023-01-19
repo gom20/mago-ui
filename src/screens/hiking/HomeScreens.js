@@ -1,5 +1,5 @@
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
     BackHandler,
     Dimensions,
@@ -17,11 +17,9 @@ const HomeScreen = () => {
     const [mountainName, setMountainName] = useState('');
     const navigation = useNavigation();
     const { showModal } = useContext(ModalContext);
-
     const onHikingPressed = () => {
         navigation.navigate('Hiking', { mountain: mountainName });
     };
-
     useFocusEffect(
         React.useCallback(() => {
             const onBackPress = async () => {
