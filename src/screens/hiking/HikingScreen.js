@@ -14,7 +14,7 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { BackHandler, StyleSheet, Text, View } from 'react-native';
+import { BackHandler, Image, StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStopwatch } from 'react-timer-hook';
@@ -411,10 +411,10 @@ export default HikingScreen = ({ route }) => {
                         }}
                         title="시작지점"
                     >
-                        <MaterialIcons
-                            name="location-pin"
-                            size={24}
-                            color="red"
+                        <Image
+                            source={require('../../assets/images/start-pin.png')}
+                            style={{ width: 32, height: 32 }}
+                            resizeMode="contain"
                         />
                     </Marker>
 
@@ -426,10 +426,10 @@ export default HikingScreen = ({ route }) => {
                         }}
                         title="현재위치"
                     >
-                        <MaterialIcons
-                            name="location-pin"
-                            size={24}
-                            color="red"
+                        <Image
+                            source={require('../../assets/images/hiking-pin.png')}
+                            style={{ width: 32, height: 32 }}
+                            resizeMode="contain"
                         />
                     </Marker.Animated>
 

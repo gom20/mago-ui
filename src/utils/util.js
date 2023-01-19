@@ -1,6 +1,13 @@
 import { Buffer } from 'buffer';
 
 const parseDatetime = (startDatetime, endDatetime) => {
+    console.log(startDatetime);
+    console.log(endDatetime);
+
+    const moment = require('moment-timezone');
+    let agreementTime = moment().tz('Asia/Seoul').format('YYYY-MM-DDTHH:mm:ss');
+    console.log(agreementTime);
+
     const WEEKDAY = [
         '일요일',
         '월요일',
@@ -10,26 +17,30 @@ const parseDatetime = (startDatetime, endDatetime) => {
         '금요일',
         '토요일',
     ];
+
+    // const startdatetime = m(startDatetime);
+    // console.log(startdatetime);
+
     const startDate = new Date(startDatetime);
     const year = startDate.getFullYear();
-    const month = startDate.getMonth() + 1;
-    const date = startDate.getDate();
-    const weekday = WEEKDAY[startDate.getDay()];
+    const month = startDate.getUTCMonth() + 1;
+    const date = startDate.getUTCDate();
+    const weekday = WEEKDAY[startDate.getUTCDay()];
 
     const endDate = new Date(endDatetime);
     const secondDiff = Math.abs(endDate - startDate) / 1000;
     const totalMinute = Math.ceil((secondDiff % 3600) / 60);
     let totalHour = Math.round(secondDiff / 3600);
 
-    let startHour = startDate.getHours();
-    startHour = startHour % 12 ? startHour % 12 : 12;
+    let startHour = startDate.getUTCHours();
     const startAmpm = startHour >= 12 ? '오후' : '오전';
-    const startMinute = startDate.getMinutes();
+    startHour = startHour > 12 ? startHour % 12 : startHour;
+    const startMinute = startDate.getUTCMinutes();
 
-    let endHour = endDate.getHours();
-    endHour = endHour % 12 ? endHour % 12 : 12;
-    const endAmpm = startHour >= 12 ? '오후' : '오전';
-    const endMinute = endDate.getMinutes();
+    let endHour = endDate.getUTCHours();
+    const endAmpm = endHour >= 12 ? '오후' : '오전';
+    endHour = endHour > 12 ? endHour % 12 : endHour;
+    const endMinute = endDate.getUTCMinutes();
 
     return {
         year: year,
