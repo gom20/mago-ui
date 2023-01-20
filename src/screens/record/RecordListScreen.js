@@ -15,57 +15,47 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     deleteRecords,
     getRecords,
-    reset,
-    select,
+    disableDelete,
+    enableDelete,
+    selectRecordToDel,
+    selectAllRecordToDel,
+    unselectRecordToDel,
 } from '../../slices/recordSlice';
 import { ModalContext } from '../../utils/ModalContext';
 
 function RecordListScreen() {
     const dispatch = useDispatch();
-    const recordsByMonth = useSelector((state) => state.record.recordsByMonth);
-    const records = useSelector((state) => state.record.records);
+    const recordGroups = useSelector((state) => state.record.recordGroups);
+    const deleteMode = useSelector((state) => state.record.deleteMode);
+    const recordsToDelete = useSelector(
+        (state) => state.record.recordsToDelete
+    );
     const navigation = useNavigation();
 
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [deleteMode, setDeleteMode] = useState(false);
-    const [itemsToDelete, setItemsToDelete] = useState([]);
     const { showModal } = useContext(ModalContext);
 
     const onItemPressed = (row) => {
-        console.log(itemsToDelete.length);
-        console.log(itemsToDelete);
         console.log('onItemPressed');
         if (!deleteMode) {
             navigation.navigate('RecordDetail', { recordId: row.uid });
         } else {
-            if (itemsToDelete.includes(row.uid)) {
-                setItemsToDelete(
-                    itemsToDelete.filter((uid) => uid !== row.uid)
-                );
+            if (recordsToDelete.includes(row.uid)) {
+                dispatch(unselectRecordToDel(row.uid));
             } else {
-                setItemsToDelete(itemsToDelete.concat([row.uid]));
+                dispatch(selectRecordToDel(row.uid));
             }
         }
     };
-
-    const activateDeleteMode = (row) => {
-        setDeleteMode(true);
-        setItemsToDelete(itemsToDelete.concat([row.uid]));
-    };
-
-    const inactivateDeleteMode = () => {
-        setDeleteMode(false);
-        setItemsToDelete([]);
-    };
-
     const onSelectAll = () => {
-        setItemsToDelete(records.map((record) => record.uid));
+        dispatch(selectAllRecordToDel());
     };
 
     const onItemLongPressed = (row) => {
         console.log('longPressed');
         if (!deleteMode) {
-            activateDeleteMode(row);
+            dispatch(enableDelete());
+            dispatch(selectRecordToDel(row.uid));
         }
     };
 
@@ -73,117 +63,19 @@ function RecordListScreen() {
         const response = await showModal({
             async: true,
             type: 'confirm',
-            message: itemsToDelete.length + ' 개 항목을 삭제하시겠습니까?',
+            message: recordsToDelete.length + ' 개 항목을 삭제하시겠습니까?',
             buttonTexts: ['아니오', '네'],
         });
 
         if (!response) return;
-        dispatch(deleteRecords({ ids: itemsToDelete }))
+        dispatch(deleteRecords())
             .unwrap()
             .then((response) => {
-                inactivateDeleteMode();
+                dispatch(disableDelete());
             })
             .catch((error) => {
                 console.error(error);
             });
-    };
-
-    const renderItem = ({ item }) => {
-        let renderItems = [];
-        if (item.groupData) {
-            renderItems = item.groupData.map((row) => {
-                return (
-                    <TouchableHighlight
-                        key={row.uid}
-                        style={[
-                            styles.itemContainer,
-                            {
-                                backgroundColor:
-                                    deleteMode &&
-                                    itemsToDelete.includes(row.uid)
-                                        ? '#FFC0CB'
-                                        : '#fff',
-                            },
-                        ]}
-                        activeOpacity={0.8}
-                        underlayColor="#DBDBDB"
-                        onPress={() => onItemPressed(row)}
-                        onLongPress={() => onItemLongPressed(row)}
-                    >
-                        <View style={styles.item}>
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    width: '20%',
-                                }}
-                            >
-                                <Text style={styles.text}>
-                                    {row.dateTime.month}월 {row.dateTime.date}일
-                                </Text>
-                            </View>
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    width: '30%',
-                                }}
-                            >
-                                <Text style={styles.text}> {row.mountain}</Text>
-                            </View>
-
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    justifyContent: 'flex-start',
-                                    alignItems: 'center',
-                                    width: '30%',
-                                }}
-                            >
-                                <MaterialIcons
-                                    name="timer"
-                                    size={15}
-                                    color="black"
-                                />
-                                <Text style={styles.text}>
-                                    {' '}
-                                    {row.dateTime.totalHour}시간{' '}
-                                    {row.dateTime.totalMinute}분
-                                </Text>
-                            </View>
-                        </View>
-                    </TouchableHighlight>
-                );
-            });
-        }
-        return (
-            <View>
-                <Text style={styles.groupTitle}>
-                    {item.groupId.substr(0, 4)}년 {item.groupId.substr(4, 2)}월
-                </Text>
-                <View>{renderItems}</View>
-            </View>
-        );
-    };
-
-    const renderEmptyComponent = () => {
-        return (
-            <View
-                style={{
-                    marginVertical: '30%',
-                    alignSelf: 'center',
-                    justifyContent: 'center',
-                }}
-            >
-                <Image
-                    source={require('../../assets/images/no-data.png')}
-                    resizeMethod="resize"
-                    resizeMode="contain"
-                ></Image>
-            </View>
-        );
     };
 
     const currentPage = useSelector((state) => state.record.pageNumber);
@@ -194,7 +86,6 @@ function RecordListScreen() {
     };
 
     const onRefresh = () => {
-        // dispatch(reset());
         fetchData({ page: 0 });
     };
 
@@ -247,20 +138,35 @@ function RecordListScreen() {
                         </Pressable>
                     </View>
                 ),
+                headerLeft: () => (
+                    <MaterialIcons
+                        name="arrow-back"
+                        size={24}
+                        color="#FFFFFF"
+                        onPress={() => {
+                            dispatch(disableDelete());
+                        }}
+                        style={{
+                            marginLeft: '15%',
+                        }}
+                    />
+                ),
+                headerTitle: '기록 삭제',
             });
         } else {
             navigation.setOptions({
                 headerTitle: '나의 산 기록',
                 headerRight: () => <></>,
+                headerLeft: () => <></>,
             });
         }
-    }, [deleteMode, itemsToDelete]);
+    }, [deleteMode, recordsToDelete]);
 
     useFocusEffect(
         React.useCallback(() => {
             const onBackPress = async () => {
                 if (deleteMode) {
-                    inactivateDeleteMode();
+                    dispatch(disableDelete());
                     return true;
                 } else {
                     navigation.navigate('홈');
@@ -276,7 +182,112 @@ function RecordListScreen() {
 
     useEffect(() => {
         fetchData({ page: 0 });
+        return () => {
+            console.log('recordList unmount');
+        };
     }, []);
+
+    const renderItem = ({ item }) => {
+        let renderItems = [];
+        if (item.groupData) {
+            renderItems = item.groupData.map((row) => {
+                return (
+                    <TouchableHighlight
+                        key={row.uid}
+                        style={[
+                            styles.itemContainer,
+                            {
+                                backgroundColor:
+                                    deleteMode &&
+                                    recordsToDelete.includes(row.uid)
+                                        ? '#FFC0CB'
+                                        : '#fff',
+                            },
+                        ]}
+                        activeOpacity={0.8}
+                        underlayColor="#DBDBDB"
+                        onPress={() => onItemPressed(row)}
+                        onLongPress={() => onItemLongPressed(row)}
+                    >
+                        <View style={styles.item}>
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    width: '20%',
+                                }}
+                            >
+                                <Text style={styles.text}>
+                                    {row.dateTime.startDatetime
+                                        .split(' ')
+                                        .slice(1, 3)
+                                        .join(' ')}
+                                </Text>
+                            </View>
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    width: '30%',
+                                }}
+                            >
+                                <Text style={styles.text}> {row.mountain}</Text>
+                            </View>
+
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    justifyContent: 'flex-start',
+                                    alignItems: 'center',
+                                    width: '30%',
+                                }}
+                            >
+                                <MaterialIcons
+                                    name="timer"
+                                    size={15}
+                                    color="black"
+                                />
+                                <Text style={styles.text}>
+                                    {row.dateTime.totalTime
+                                        .split(' ')
+                                        .slice(0, 2)
+                                        .join(' ')}
+                                </Text>
+                            </View>
+                        </View>
+                    </TouchableHighlight>
+                );
+            });
+        }
+        return (
+            <View>
+                <Text style={styles.groupTitle}>
+                    {item.groupId.substr(0, 4)}년 {item.groupId.substr(4, 2)}월
+                </Text>
+                <View>{renderItems}</View>
+            </View>
+        );
+    };
+
+    const renderEmptyComponent = () => {
+        return (
+            <View
+                style={{
+                    marginVertical: '30%',
+                    alignSelf: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                <Image
+                    source={require('../../assets/images/no-data.png')}
+                    resizeMethod="resize"
+                    resizeMode="contain"
+                ></Image>
+            </View>
+        );
+    };
 
     return (
         <View style={styles.container}>
@@ -298,14 +309,13 @@ function RecordListScreen() {
                 </View>
             </View>
             <FlatList
-                data={recordsByMonth}
+                data={recordGroups}
                 renderItem={renderItem}
                 keyExtractor={extractKey}
                 ListEmptyComponent={renderEmptyComponent}
                 onRefresh={onRefresh}
                 refreshing={isRefreshing}
                 onEndReached={onEndReached}
-                // onEndReachedThreshold={0.8}
             />
         </View>
     );
@@ -314,7 +324,6 @@ function RecordListScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // backgroundColor: 'red',
     },
     imageContainer: {
         width: '100%',
@@ -333,7 +342,6 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#EEEEEE',
         backgroundColor: '#FFF',
-        // elevation: 2,
     },
     itemContainer: {
         height: 55,

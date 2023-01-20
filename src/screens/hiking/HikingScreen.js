@@ -20,9 +20,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useStopwatch } from 'react-timer-hook';
 import CustomButton from '../../components/CustomButton';
 import {
-    resetPositions,
+    endBreak,
+    resetHiking,
     setCurPosition,
     setStartPosition,
+    startBreak,
 } from '../../slices/hikingSlice';
 import { hideLoading, showLoading } from '../../slices/loadingSlice';
 import { createRecord } from '../../slices/recordSlice';
@@ -40,6 +42,7 @@ export default HikingScreen = ({ route }) => {
     const hourTime = hours < 10 ? `0${hours}` : `${hours}`;
     const secondTime = seconds < 10 ? `0${seconds}` : `${seconds}`;
     const minuteTime = minutes < 10 ? `0${minutes}` : `${minutes}`;
+
     const pauseBtnProps = {
         text: '일시정지',
         iconType: 'pause',
@@ -55,6 +58,7 @@ export default HikingScreen = ({ route }) => {
 
     const curPosition = useSelector((state) => state.hiking.curPosition);
     const startPosition = useSelector((state) => state.hiking.startPosition);
+    const breakTime = useSelector((state) => state.hiking.breakInfo.totalTime);
     const user = useSelector((state) => state.auth.user);
 
     const [isGpsFixed, setGpsFixed] = useState(true);
@@ -62,7 +66,6 @@ export default HikingScreen = ({ route }) => {
     const [toggleProps, setToggleProps] = useState(pauseBtnProps);
     const [startDatetime, setStartDatetime] = useState(null);
     const [permissionGranted, setPermissionGranted] = useState(false);
-
     const BACKGROUND_LOCATION_TASK = 'BACKGROUND-LOCATION-TASK';
     let curMarkerRef = useRef();
     let mapViewRef = useRef();
@@ -121,6 +124,8 @@ export default HikingScreen = ({ route }) => {
             return date.toISOString().substring(0, 20);
         };
 
+        console.log(breakTime);
+
         dispatch(
             createRecord({
                 email: user.email,
@@ -130,6 +135,7 @@ export default HikingScreen = ({ route }) => {
                 distance: curPosition.distance,
                 minAltitude: curPosition.minAltitude,
                 maxAltitude: curPosition.maxAltitude,
+                breakTime: breakTime,
                 imgPath: snapshotUri,
             })
         )
@@ -165,12 +171,17 @@ export default HikingScreen = ({ route }) => {
         });
     };
 
-    const startHiking = () => {
+    const initHiking = () => {
         setStartDatetime(new Date());
-        resumeHiking();
+        startHiking();
     };
 
     const resumeHiking = () => {
+        dispatch(endBreak(new Date().getSeconds()));
+        startHiking();
+    };
+
+    const startHiking = () => {
         start();
         startBackgroundPositionUpdate();
         setToggleProps(pauseBtnProps);
@@ -179,6 +190,7 @@ export default HikingScreen = ({ route }) => {
 
     const stopHiking = () => {
         pause();
+        dispatch(startBreak(new Date().getSeconds()));
         stopBackgroundPositionUpdate();
         setToggleProps(resumeBtnProps);
         setHiking(false);
@@ -225,8 +237,9 @@ export default HikingScreen = ({ route }) => {
             BACKGROUND_LOCATION_TASK
         );
         if (hasStarted) {
-            console.log('Already started');
-            return;
+            console.log('Already started. stop then start');
+            await Location.stopLocationUpdatesAsync(BACKGROUND_LOCATION_TASK);
+            console.log('Location tacking stopped');
         }
 
         await Location.startLocationUpdatesAsync(BACKGROUND_LOCATION_TASK, {
@@ -267,6 +280,34 @@ export default HikingScreen = ({ route }) => {
             }
         }
     );
+
+    const loadCurrentPosition = (mapViewRef) => {
+        console.log('현재 위치 요청');
+        Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.BestForNavigation,
+        })
+            .then((response) => {
+                console.log('현재 위치 로드 완료');
+                dispatch(hideLoading());
+                setCurrentPosition(response);
+                mapViewRef.animateToRegion({
+                    latitude: response.coords.latitude,
+                    longitude: response.coords.longitude,
+                    latitudeDelta: curPosition.latitudeDelta,
+                    longitudeDelta: curPosition.longitudeDelta,
+                });
+                initHiking();
+            })
+            .catch(async (error) => {
+                console.error(error);
+                dispatch(hideLoading());
+                await showModal({
+                    async: true,
+                    message: '위치정보를 가져올 수 없습니다.',
+                });
+                navigation.navigate('MainTab');
+            });
+    };
 
     const confirmBackAction = async () => {
         const response = await showModal({
@@ -309,34 +350,6 @@ export default HikingScreen = ({ route }) => {
         });
     }, [navigation]);
 
-    const loadCurrentPosition = (mapViewRef) => {
-        console.log('현재 위치 요청');
-        Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.BestForNavigation,
-        })
-            .then((response) => {
-                console.log('현재 위치 로드 완료');
-                dispatch(hideLoading());
-                setCurrentPosition(response);
-                mapViewRef.animateToRegion({
-                    latitude: response.coords.latitude,
-                    longitude: response.coords.longitude,
-                    latitudeDelta: curPosition.latitudeDelta,
-                    longitudeDelta: curPosition.longitudeDelta,
-                });
-                startHiking();
-            })
-            .catch(async (error) => {
-                console.error(error);
-                dispatch(hideLoading());
-                await showModal({
-                    async: true,
-                    message: '위치정보를 가져올 수 없습니다.',
-                });
-                navigation.navigate('MainTab');
-            });
-    };
-
     useEffect(() => {
         const requestPermissions = async () => {
             const foreground =
@@ -378,7 +391,7 @@ export default HikingScreen = ({ route }) => {
             console.log('Component Unmount');
             setPermissionGranted(false);
             dispatch(hideLoading());
-            dispatch(resetPositions());
+            dispatch(resetHiking());
             stopBackgroundPositionUpdate();
         };
     }, []);
@@ -466,7 +479,7 @@ export default HikingScreen = ({ route }) => {
                             <Text style={styles.labelText}>거리</Text>
                         </View>
                         <Text style={styles.value}>
-                            {curPosition.distance.toFixed(2)}m
+                            {curPosition.distance.toFixed(3)} m
                         </Text>
                     </View>
 
@@ -480,7 +493,7 @@ export default HikingScreen = ({ route }) => {
                             <Text style={styles.labelText}>고도</Text>
                         </View>
                         <Text style={styles.value}>
-                            {curPosition.altitude.toFixed(2)}m
+                            {curPosition.altitude.toFixed(2)} m
                         </Text>
                     </View>
                     <View style={styles.info}></View>

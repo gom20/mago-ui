@@ -23,7 +23,7 @@ const MainTab = () => {
                     if (route.name === '홈') {
                         iconName = 'home';
                     } else if (route.name === '나의 산 기록') {
-                        iconName = 'calendar-check';
+                        iconName = 'format-list-bulleted';
                     } else if (route.name === '도전 100대 명산') {
                         iconName = 'flag-variant';
                     } else if (route.name === '마이') {

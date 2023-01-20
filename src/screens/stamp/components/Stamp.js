@@ -1,8 +1,8 @@
 import { useContext } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { updateStamp } from '../../slices/stampSlice';
-import { ModalContext } from '../../utils/ModalContext';
+import { updateStamp } from '../../../slices/stampSlice';
+import { ModalContext } from '../../../utils/ModalContext';
 
 const MountainComponent = ({
     mountainId,

@@ -7,12 +7,8 @@ export const createRecord = createAsyncThunk(
     async (request, thunkAPI) => {
         try {
             const response = await recordAPI.createRecord(request);
-            response.data.dateTime = util.parseDatetime(
-                response.data.startDatetime,
-                response.data.endDatetime
-            );
-            response.data.groupId =
-                response.data.dateTime.year + '' + response.data.dateTime.month;
+            response.data.dateTime = util.parseDatetime(response.data);
+            response.data.groupId = response.data.dateTime.groupId;
             return response;
         } catch (error) {
             console.error(error);
@@ -27,11 +23,8 @@ export const getRecords = createAsyncThunk(
         try {
             const response = await recordAPI.getRecords({ params });
             response.data.content.forEach((item) => {
-                item.dateTime = util.parseDatetime(
-                    item.startDatetime,
-                    item.endDatetime
-                );
-                item.groupId = item.dateTime.year + '' + item.dateTime.month;
+                item.dateTime = util.parseDatetime(item);
+                item.groupId = item.dateTime.groupId;
                 item.selected = false;
             });
             return response;
@@ -46,7 +39,10 @@ export const deleteRecords = createAsyncThunk(
     'record/deleteRecords',
     async (request, thunkAPI) => {
         try {
-            const response = await recordAPI.deleteRecords(request);
+            const { recordsToDelete } = thunkAPI.getState().record;
+            const response = await recordAPI.deleteRecords({
+                ids: recordsToDelete,
+            });
             return response;
         } catch (error) {
             console.error(error);
@@ -57,55 +53,60 @@ export const deleteRecords = createAsyncThunk(
 
 const initialState = {
     records: [],
-    recordsByMonth: [],
-    totalElements: 0,
-    pageNumber: 0,
+    recordGroups: [],
+    totalCount: 0,
+    page: 0,
     last: true,
+    deleteMode: false,
+    recordsToDelete: [],
 };
 
 const recordSlice = createSlice({
     name: 'record',
     initialState,
     reducers: {
-        reset(state) {
+        resetRecord(state) {
             Object.assign(state, initialState);
         },
-        select(state, action) {
-            //             var found = obj.find(e => e.name === 'John');
-            // console.log(found);
-
-            console.log(action.payload);
-            // records.find((record) => record.uid)
-
-            state.records.map((record) => {
-                if (record.uid == action.payload.uid) {
-                    record.selected = action.payload.selected;
-                    console.log(record);
-                }
-            });
-            Object.assign(state, state);
-            // record.selected = action.payload.selected;
+        enableDelete(state) {
+            state.deleteMode = true;
+        },
+        disableDelete(state) {
+            state.deleteMode = false;
+            state.recordsToDelete = [];
+        },
+        selectRecordToDel(state, action) {
+            state.recordsToDelete = state.recordsToDelete.concat([
+                action.payload,
+            ]);
+        },
+        selectAllRecordToDel(state) {
+            state.recordsToDelete = state.records.map((record) => record.uid);
+        },
+        unselectRecordToDel(state, action) {
+            state.recordsToDelete = state.recordsToDelete.filter(
+                (uid) => uid !== action.payload
+            );
         },
     },
     extraReducers: (builder) => {
         builder
             .addCase(createRecord.fulfilled, (state, action) => {
                 const data = action.payload.data;
-                state.records = [data].concat(state.records);
+                state.records.unshift(data);
                 if (
-                    state.recordsByMonth.length > 0 &&
-                    state.recordsByMonth[0].groupId == data.groupId
+                    state.recordGroups.length > 0 &&
+                    state.recordGroups[0].groupId == data.groupId
                 ) {
-                    state.recordsByMonth[0].groupData.unshift(data);
+                    state.recordGroups[0].groupData.unshift(data);
                 } else {
-                    state.recordsByMonth.unshift({
-                        groupId: data.groupId,
-                        groupData: data,
-                    });
+                    state.recordGroups = [
+                        {
+                            groupId: data.groupId,
+                            groupData: data,
+                        },
+                    ];
                 }
-            })
-            .addCase(createRecord.rejected, (state, action) => {
-                // state.record = {};
             })
             .addCase(getRecords.fulfilled, (state, action) => {
                 const data = action.payload.data;
@@ -116,48 +117,39 @@ const recordSlice = createSlice({
                             index === self.findIndex((o) => o.uid === value.uid)
                     );
 
-                let recordsByMonth = [];
+                let recordGroups = [];
                 Object.entries(util.groupBy(state.records, 'groupId')).forEach(
                     ([key, value]) => {
-                        recordsByMonth.push({
+                        recordGroups.push({
                             groupId: key,
                             groupData: value,
                         });
                     }
                 );
-                state.recordsByMonth = recordsByMonth;
-                state.totalElements = data.totalElements;
-                state.pageNumber =
-                    state.pageNumber <= data.pageable.pageNumber
-                        ? data.pageable.pageNumber
-                        : state.pageNumber;
-
-                state.last =
-                    state.pageNumber <= data.pageable.pageNumber
-                        ? data.last
-                        : state.last;
-            })
-            .addCase(getRecords.rejected, (state, action) => {
-                // state.records = [];
+                state.recordGroups = recordGroups;
+                state.totalCount = data.totalElements;
+                if (state.page <= data.pageable.pageNumber) {
+                    state.page = data.pageable.pageNumber;
+                    state.last = data.last;
+                }
             })
             .addCase(deleteRecords.fulfilled, (state, action) => {
                 const data = action.payload.data;
                 state.records = state.records.filter(
                     (record) => !data.ids.includes(record.uid)
                 );
-                let recordsByMonth = [];
+                let recordGroups = [];
                 Object.entries(util.groupBy(state.records, 'groupId')).forEach(
                     ([key, value]) => {
-                        recordsByMonth.push({
+                        recordGroups.push({
                             groupId: key,
                             groupData: value,
                         });
                     }
                 );
-                state.recordsByMonth = recordsByMonth;
-                state.totalElements = state.totalElements - data.ids.length;
+                state.recordGroups = recordGroups;
+                state.totalCount = state.totalCount - data.ids.length;
             })
-            .addCase(deleteRecords.rejected, (state, action) => {})
             .addDefaultCase((state, action) => {});
     },
 });
@@ -168,5 +160,13 @@ export const selectRecordById = (state, recordId) => {
     return state.records.find((record) => record.uid == recordId);
 };
 
-export const { reset, select } = recordSlice.actions;
+export const {
+    resetRecord,
+    enableDelete,
+    disableDelete,
+    selectAllRecordToDel,
+    selectRecordToDel,
+    unselectRecordToDel,
+    resetRecordToDel,
+} = recordSlice.actions;
 export default recordSlice.reducer;

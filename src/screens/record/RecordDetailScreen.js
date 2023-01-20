@@ -2,11 +2,10 @@ import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { BackHandler, Image, StyleSheet, Text, View } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { selectRecordById } from '../../slices/recordSlice';
 
 const RecordDetailScreen = ({ route }) => {
-    const dispatch = useDispatch();
     const navigation = useNavigation();
     const [imageLoadError, setImageLoadError] = useState(false);
 
@@ -37,8 +36,7 @@ const RecordDetailScreen = ({ route }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.text}>
-                {record.dateTime.year}년 {record.dateTime.month}월{' '}
-                {record.dateTime.date}일 {record.dateTime.weekday}
+                {record.dateTime.startDatetime.split(' ').slice(0, 4).join(' ')}
             </Text>
             <View style={styles.summaryContainer}>
                 <View style={styles.summaryItem}>
@@ -47,15 +45,17 @@ const RecordDetailScreen = ({ route }) => {
                         {record.mountain}
                     </Text>
                 </View>
-                <View style={[styles.verticalLine, { height: '30%' }]}></View>
+                {/* <View style={[styles.verticalLine, { height: '30%' }]}></View> */}
                 <View style={styles.summaryItem}>
                     <FontAwesome5 name="hiking" size={24} color="#FFF" />
                     <Text style={{ color: '#FFF', marginTop: 5 }}>
-                        {record.dateTime.totalHour}시간{' '}
-                        {record.dateTime.totalMinute}분
+                        {record.dateTime.totalTime
+                            .split(' ')
+                            .slice(0, 4)
+                            .join(' ')}
                     </Text>
                 </View>
-                <View style={[styles.verticalLine, { height: '30%' }]}></View>
+                {/* <View style={[styles.verticalLine, { height: '30%' }]}></View> */}
                 <View style={styles.summaryItem}>
                     <MaterialCommunityIcons
                         name="map-marker-distance"
@@ -84,27 +84,12 @@ const RecordDetailScreen = ({ route }) => {
             <View style={styles.recordContainer}>
                 <View style={styles.recordItemContainer}>
                     <View style={[styles.recordItem, styles.recordItemLeft]}>
-                        <Text style={styles.smallText}>총 등산 시간</Text>
-                        <Text style={styles.boldText}>
-                            {record.dateTime.totalHour}시간{' '}
-                            {record.dateTime.totalMinute}분
-                        </Text>
-                    </View>
-                    <View style={styles.verticalLine}></View>
-                    <View style={[styles.recordItem, styles.recordItemRight]}>
-                        <Text style={styles.smallText}>총 등산 거리</Text>
-                        <Text style={styles.boldText}>
-                            {record.distance.toFixed(2)} m
-                        </Text>
-                    </View>
-                </View>
-                <View style={styles.recordItemContainer}>
-                    <View style={[styles.recordItem, styles.recordItemLeft]}>
                         <Text style={styles.smallText}>등산 시작</Text>
                         <Text style={styles.boldText}>
-                            {record.dateTime.startAmpm}{' '}
-                            {record.dateTime.startHour}시{' '}
-                            {record.dateTime.startMinute}분
+                            {record.dateTime.startDatetime
+                                .split(' ')
+                                .slice(4, 7)
+                                .join(' ')}
                         </Text>
                     </View>
                     <View style={styles.verticalLine}></View>
@@ -112,11 +97,45 @@ const RecordDetailScreen = ({ route }) => {
                         <Text style={styles.smallText}>등산 완료</Text>
 
                         <Text style={styles.boldText}>
-                            {record.dateTime.endAmpm} {record.dateTime.endHour}
-                            시 {record.dateTime.endMinute}분
+                            {record.dateTime.endDatetime
+                                .split(' ')
+                                .slice(4, 7)
+                                .join(' ')}
                         </Text>
                     </View>
                 </View>
+
+                <View style={styles.recordItemContainer}>
+                    <View style={[styles.recordItem, styles.recordItemLeft]}>
+                        <Text style={styles.smallText}>소요 시간</Text>
+                        <Text style={styles.boldText}>
+                            {record.dateTime.totalTime}
+                        </Text>
+                    </View>
+                    <View style={styles.verticalLine}></View>
+                    <View style={[styles.recordItem, styles.recordItemRight]}>
+                        <Text style={styles.smallText}>휴식 시간</Text>
+                        <Text style={styles.boldText}>
+                            {record.dateTime.breakTime}
+                        </Text>
+                    </View>
+                </View>
+                <View style={styles.recordItemContainer}>
+                    <View style={[styles.recordItem, styles.recordItemLeft]}>
+                        <Text style={styles.smallText}>전체 거리</Text>
+                        <Text style={styles.boldText}>
+                            {record.distance.toFixed(2)} km
+                        </Text>
+                    </View>
+                    <View style={styles.verticalLine}></View>
+                    <View style={[styles.recordItem, styles.recordItemRight]}>
+                        <Text style={styles.smallText}>평균 속도</Text>
+                        <Text style={styles.boldText}>
+                            {record.avgSpeed.toFixed(2)} km/h
+                        </Text>
+                    </View>
+                </View>
+
                 <View style={styles.recordItemContainer}>
                     <View style={[styles.recordItem, styles.recordItemLeft]}>
                         <Text style={styles.smallText}>최저 고도</Text>
@@ -201,7 +220,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignSelf: 'stretch',
         justifyContent: 'center',
-        height: 70,
+        height: 50,
         alignItems: 'center',
     },
     recordItemLeft: {

@@ -1,60 +1,56 @@
 import { Buffer } from 'buffer';
 
-const parseDatetime = (startDatetime, endDatetime) => {
-    console.log(startDatetime);
-    console.log(endDatetime);
+const parseDatetime = (data) => {
+    const startDatetime = data.startDatetime,
+        endDatetime = data.endDatetime,
+        totalTime = data.totalTime,
+        hikingTime = data.hikingTime,
+        breakTime = data.breakTime;
 
-    const moment = require('moment-timezone');
-    let agreementTime = moment().tz('Asia/Seoul').format('YYYY-MM-DDTHH:mm:ss');
-    console.log(agreementTime);
+    const _getGroupId = (dateObj) => {
+        return dateObj.getUTCFullYear() + '' + (dateObj.getUTCMonth() + 1);
+    };
 
-    const WEEKDAY = [
-        '일요일',
-        '월요일',
-        '화요일',
-        '수요일',
-        '목요일',
-        '금요일',
-        '토요일',
-    ];
+    const _getDatetimeString = (dateObj) => {
+        const WEEKDAY = [
+            '일요일',
+            '월요일',
+            '화요일',
+            '수요일',
+            '목요일',
+            '금요일',
+            '토요일',
+        ];
 
-    // const startdatetime = m(startDatetime);
-    // console.log(startdatetime);
+        const arr = [];
+        arr.push(dateObj.getUTCFullYear() + '년');
+        arr.push(dateObj.getUTCMonth() + 1 + '월');
+        arr.push(dateObj.getUTCDate() + '일');
+        arr.push(WEEKDAY[dateObj.getUTCDay()]);
 
-    const startDate = new Date(startDatetime);
-    const year = startDate.getFullYear();
-    const month = startDate.getUTCMonth() + 1;
-    const date = startDate.getUTCDate();
-    const weekday = WEEKDAY[startDate.getUTCDay()];
+        const hour = dateObj.getUTCHours();
+        arr.push(hour >= 12 ? '오후' : '오전');
+        arr.push(hour > 12 ? (hour % 12) + '시' : hour + '시');
+        arr.push(dateObj.getUTCMinutes() + '분');
+        arr.push(dateObj.getUTCSeconds() + '초');
+        return arr.join(' ');
+    };
 
-    const endDate = new Date(endDatetime);
-    const secondDiff = Math.abs(endDate - startDate) / 1000;
-    const totalMinute = Math.ceil((secondDiff % 3600) / 60);
-    let totalHour = Math.round(secondDiff / 3600);
-
-    let startHour = startDate.getUTCHours();
-    const startAmpm = startHour >= 12 ? '오후' : '오전';
-    startHour = startHour > 12 ? startHour % 12 : startHour;
-    const startMinute = startDate.getUTCMinutes();
-
-    let endHour = endDate.getUTCHours();
-    const endAmpm = endHour >= 12 ? '오후' : '오전';
-    endHour = endHour > 12 ? endHour % 12 : endHour;
-    const endMinute = endDate.getUTCMinutes();
+    const _getDurationString = (duration) => {
+        const arr = [];
+        arr.push(Math.floor(duration / 3600) + '시간');
+        arr.push(Math.floor((duration % 3600) / 60) + '분');
+        arr.push(Math.floor(duration % 60) + '초');
+        return arr.join(' ');
+    };
 
     return {
-        year: year,
-        month: month,
-        date: date,
-        weekday: weekday,
-        totalHour: totalHour,
-        totalMinute: totalMinute,
-        startHour: startHour,
-        startMinute: startMinute,
-        startAmpm: startAmpm,
-        endHour: endHour,
-        endMinute: endMinute,
-        endAmpm: endAmpm,
+        groupId: _getGroupId(new Date(startDatetime)),
+        startDatetime: _getDatetimeString(new Date(startDatetime)),
+        endDatetime: _getDatetimeString(new Date(endDatetime)),
+        totalTime: _getDurationString(totalTime),
+        hikingTime: _getDurationString(hikingTime),
+        breakTime: _getDurationString(breakTime),
     };
 };
 

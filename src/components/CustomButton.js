@@ -53,8 +53,6 @@ const CustomButton = ({
 
 const styles = StyleSheet.create({
     defaultContainer: {
-        // width: '100%',
-        // height: 45,
         alignItems: 'center',
         marginBottom: 11,
         borderRadius: 5,

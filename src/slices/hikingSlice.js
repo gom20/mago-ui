@@ -21,19 +21,23 @@ const initialState = {
         latitude: LAT,
         longitude: LNG,
     },
+    breakInfo: {
+        totalTime: 0,
+        startTime: 0,
+        endTime: 0,
+    },
 };
 
 const calcDistance = (prevLatLng, newLatLng) => {
-    return haversine(prevLatLng, newLatLng, { unit: 'meter' }) || 0;
+    return haversine(prevLatLng, newLatLng, { unit: 'kilometer' }) || 0;
 };
 
 const hikingSlice = createSlice({
     name: 'hiking',
     initialState,
     reducers: {
-        resetPositions: (state) => {
-            state.curPosition = initialState.curPosition;
-            state.startPosition = initialState.startPosition;
+        resetHiking: (state) => {
+            Object.assign(state, initialState);
         },
         setCurPosition: (state, action) => {
             const payload = action.payload;
@@ -65,9 +69,25 @@ const hikingSlice = createSlice({
             state.startPosition.latitude = payload.latitude;
             state.startPosition.longitude = payload.longitude;
         },
+        startBreak: (state, action) => {
+            state.breakInfo.startTime = action.payload;
+        },
+        endBreak: (state, action) => {
+            state.breakInfo.endTime = action.payload;
+            state.breakInfo.totalTime =
+                state.breakInfo.totalTime +
+                (action.payload - state.breakInfo.startTime);
+        },
     },
 });
 
-export const { resetPositions, setCurPosition, setStartPosition } =
-    hikingSlice.actions;
+export const {
+    resetHiking,
+    setCurPosition,
+    setStartPosition,
+    incrementBreakTime,
+    startBreak,
+    endBreak,
+    resetBreak,
+} = hikingSlice.actions;
 export default hikingSlice.reducer;

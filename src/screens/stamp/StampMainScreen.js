@@ -1,5 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Confetti from 'react-native-confetti';
 import { useDispatch, useSelector } from 'react-redux';
@@ -100,7 +99,6 @@ function StampMainScreen() {
     useEffect(() => {
         console.log('[StampMainScreen] useEffect');
         if (flagCount == 100) {
-            console.log('[StampMainScreen] startConfetti');
             confettiRef.startConfetti();
         }
     }, [flagCount]);

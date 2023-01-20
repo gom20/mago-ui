@@ -11,7 +11,7 @@ import {
     JeonbukSvg,
     JeonnamSvg,
     SeoulGeonggiSvg,
-} from './SvgRegionComponent';
+} from './SvgRegion';
 import { useSelector } from 'react-redux';
 import {
     isFlagByRegionType,

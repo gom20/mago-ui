@@ -2,8 +2,8 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useContext, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import MountainComponent from '../../components/stamp/MountainComponent';
-import RegionComponent from '../../components/stamp/RegionComponent';
+import MountainComponent from './components/Stamp';
+import RegionComponent from './components/Region';
 import {
     selectFlagCountByRegionType,
     selectStampsByRegionType,
