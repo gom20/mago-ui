@@ -9,7 +9,7 @@ import {
     View,
 } from 'react-native';
 import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown';
-import mountains from '../../../mountains.json';
+import mountains from '../../mountains.json';
 import CustomButton from '../../components/CustomButton';
 import { ModalContext } from '../../utils/ModalContext';
 
@@ -20,6 +20,7 @@ const HomeScreen = () => {
     const onHikingPressed = () => {
         navigation.navigate('Hiking', { mountain: mountainName });
     };
+
     useFocusEffect(
         React.useCallback(() => {
             const onBackPress = async () => {

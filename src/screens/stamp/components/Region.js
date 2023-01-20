@@ -1,6 +1,8 @@
+import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import { selectStampsByRegion } from '../../../slices/stampSlice';
 import {
     ChungbukSvg,
     ChungnamSvg,
@@ -12,13 +14,8 @@ import {
     JeonnamSvg,
     SeoulGeonggiSvg,
 } from './SvgRegion';
-import { useSelector } from 'react-redux';
-import {
-    isFlagByRegionType,
-    selectStampsByRegionType,
-} from '../../slices/stampSlice';
 
-const RegionComponent = ({
+const Region = ({
     regionType,
     pressable,
     regionName,
@@ -28,13 +25,12 @@ const RegionComponent = ({
 }) => {
     const [regionColor, setRegionColor] = useState('#E1F7CB');
     const navigation = useNavigation();
-    // const flag = false;
-    const stampsByRegionType = useSelector((state) =>
-        selectStampsByRegionType(state.stamp, regionType)
+    const stamps = useSelector((state) =>
+        selectStampsByRegion(state.stamp, regionType)
     );
     const flag =
-        stampsByRegionType.length > 0
-            ? stampsByRegionType.find((stamp) => stamp.flag == false)
+        stamps.length > 0
+            ? stamps.find((stamp) => stamp.flag == false)
                 ? false
                 : true
             : false;
@@ -83,7 +79,7 @@ const RegionComponent = ({
                             left: '45%',
                         },
                     ]}
-                    source={require('../../assets/images/flag.png')}
+                    source={require('../../../assets/images/flag.png')}
                     resizeMode="contain"
                 ></Image>
             );
@@ -111,17 +107,10 @@ const RegionComponent = ({
                         }}
                         onTouchStart={() => setRegionColor('#0DD36E')}
                         onTouchEnd={() => setRegionColor('#E1F7CB')}
-                        style={[
-                            {
-                                // position: 'absolute',
-                                // top: pressableTop,
-                                // left: pressableLeft,
-                            },
-                            styles.regionPressableContainer,
-                        ]}
+                        style={styles.regionPressableContainer}
                     >
                         <Image
-                            source={require('../../assets/images/mountain-icon.png')}
+                            source={require('../../../assets/images/mountain-icon.png')}
                         ></Image>
                         <Text>{regionName}</Text>
                     </Pressable>
@@ -138,4 +127,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default RegionComponent;
+export default Region;

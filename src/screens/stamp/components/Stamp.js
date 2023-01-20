@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { updateStamp } from '../../../slices/stampSlice';
 import { ModalContext } from '../../../utils/ModalContext';
 
-const MountainComponent = ({
+const Stamp = ({
     mountainId,
     mountainName,
     positionX,
@@ -13,11 +13,10 @@ const MountainComponent = ({
     onPressed,
 }) => {
     const dispatch = useDispatch();
-
     const { showModal } = useContext(ModalContext);
 
-    const onMountainPressed = async () => {
-        console.log('pressed');
+    const onStampPressed = async () => {
+        console.log('[Stamp] onStampPressed');
 
         const confirmMessage = flag
             ? '에서 깃발을 회수하시겠습니까?'
@@ -29,8 +28,6 @@ const MountainComponent = ({
             message: mountainName + confirmMessage,
             buttonTexts: ['아니오', confirmButtonText],
         });
-
-        // 아니오 버튼 클릭
         if (!response) return;
 
         dispatch(
@@ -60,18 +57,18 @@ const MountainComponent = ({
             {flag && (
                 <Image
                     style={styles.flag}
-                    source={require('../../assets/images/flag.png')}
+                    source={require('../../../assets/images/flag.png')}
                     resizeMode="contain"
                 ></Image>
             )}
             <Pressable
                 onPress={() => {
-                    onMountainPressed();
+                    onStampPressed();
                 }}
                 style={styles.pressableContainer}
             >
                 <Image
-                    source={require('../../assets/images/mountain-icon.png')}
+                    source={require('../../../assets/images/mountain-icon.png')}
                 ></Image>
                 <Text
                     style={[
@@ -107,4 +104,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default MountainComponent;
+export default Stamp;

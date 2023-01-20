@@ -39,41 +39,28 @@ const stampSlice = createSlice({
             .addCase(getStamps.fulfilled, (state, action) => {
                 state.stamps = action.payload.data;
             })
-            .addCase(getStamps.rejected, (state, action) => {})
             .addCase(updateStamp.fulfilled, (state, action) => {
-                mountainId = action.payload.data.mountainId;
-                flag = action.payload.data.flag;
+                const data = action.payload.data;
                 state.stamps.find(
-                    (stamp) => stamp.mountainId == mountainId
-                ).flag = flag;
+                    (stamp) => stamp.mountainId == data.mountainId
+                ).flag = data.flag;
             })
-            .addCase(updateStamp.rejected, (state, action) => {})
             .addDefaultCase((state, action) => {});
     },
 });
 
-export const selectStampCount = (state) => {
+export const selectStampsByRegion = (state, regionType) => {
+    return state.stamps.filter((stamp) => stamp.regionType == regionType);
+};
+
+export const selectFlagCount = (state) => {
     return state.stamps.filter((stamp) => stamp.flag == true).length;
 };
 
-export const selectStampsByRegionType = (state, regionType) => {
-    return state.stamps.filter((stamp) => stamp.regionType == regionType);
-};
-
-export const selectFlagCountByRegionType = (state, regionType) => {
+export const selectFlagCountByRegion = (state, regionType) => {
     return state.stamps.filter(
         (stamp) => stamp.regionType == regionType && stamp.flag == true
     ).length;
-};
-
-export const isFlagByRegionType = (state, regionType) => {
-    regionStamps = state.stamps.filter(
-        (stamp) => stamp.regionType == regionType
-    );
-    regionStamps.forEach((stamp) => {
-        if (!stamp.flag) return false;
-    });
-    return state.stamps.filter((stamp) => stamp.regionType == regionType);
 };
 
 export default stampSlice.reducer;

@@ -1,31 +1,30 @@
-import { useNavigation } from '@react-navigation/native';
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import MountainComponent from './components/Stamp';
-import RegionComponent from './components/Region';
-import {
-    selectFlagCountByRegionType,
-    selectStampsByRegionType,
-} from '../../slices/stampSlice';
 import Confetti from 'react-native-confetti';
+import { useSelector } from 'react-redux';
+import {
+    selectFlagCountByRegion,
+    selectStampsByRegion,
+} from '../../slices/stampSlice';
 import { ModalContext } from '../../utils/ModalContext';
+import Region from './components/Region';
+import Stamp from './components/Stamp';
 
 function StampDetailScreen({ route }) {
-    const dispatch = useDispatch();
-    const navigation = useNavigation();
     const { regionType, regionName } = route.params;
     const { showModal } = useContext(ModalContext);
-    const StampsByRegion = useSelector((state) =>
-        selectStampsByRegionType(state.stamp, regionType)
+
+    const stamps = useSelector((state) =>
+        selectStampsByRegion(state.stamp, regionType)
     );
-    const StampsByRegionCount = useSelector((state) =>
-        selectFlagCountByRegionType(state.stamp, regionType)
+    const flagCount = useSelector((state) =>
+        selectFlagCountByRegion(state.stamp, regionType)
     );
+
     let confettiRef;
 
     const onPressed = (check) => {
-        if (check && StampsByRegionCount == StampsByRegion.length - 1) {
+        if (check && flagCount == stamps.length - 1) {
             const message =
                 '대단해요!\n' +
                 regionName +
@@ -36,13 +35,13 @@ function StampDetailScreen({ route }) {
             });
         }
     };
+
     useEffect(() => {
-        if (StampsByRegionCount == StampsByRegion.length) {
+        console.log('[StampDetailScreen] useEffect flagCount updated');
+        if (flagCount == stamps.length) {
             confettiRef.startConfetti();
         }
-
-        console.log('useEffect');
-    }, []);
+    }, [flagCount]);
 
     return (
         <View style={styles.container}>
@@ -50,7 +49,6 @@ function StampDetailScreen({ route }) {
                 ref={(ref) => (confettiRef = ref)}
                 duration={6000}
                 confettiCount={30}
-                // timeout={}
             />
             <Text style={styles.text}>{regionName}</Text>
             <Text style={styles.smallText}>
@@ -65,33 +63,21 @@ function StampDetailScreen({ route }) {
                             fontWeight: '600',
                         }}
                     >
-                        {StampsByRegionCount}
+                        {flagCount}
                     </Text>
                 </View>
-                <Text style={styles.totalCount}>
-                    {' '}
-                    / {StampsByRegion.length}
-                </Text>
+                <Text style={styles.totalCount}> / {stamps.length}</Text>
             </View>
             <View style={styles.regionContainer}>
-                <View
-                    style={
-                        {
-                            // position: 'absolute',
-                            // top: 0,
-                            // left: 0,
-                            // backgroundColor: 'red',
-                        }
-                    }
-                >
-                    <RegionComponent
+                <View>
+                    <Region
                         regionType={regionType}
                         pressable={false}
                         size={'LARGE'}
-                    ></RegionComponent>
-                    {StampsByRegion.map((stamp) => {
+                    ></Region>
+                    {stamps.map((stamp) => {
                         return (
-                            <MountainComponent
+                            <Stamp
                                 key={stamp.mountainId}
                                 mountainId={stamp.mountainId}
                                 mountainName={stamp.mountainName}
@@ -99,7 +85,7 @@ function StampDetailScreen({ route }) {
                                 positionY={Number(stamp.positionY)}
                                 flag={stamp.flag}
                                 onPressed={onPressed}
-                            ></MountainComponent>
+                            ></Stamp>
                         );
                     })}
                 </View>
@@ -144,7 +130,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
     regionContainer: {
-        // marginTop: '5%',
         alignItems: 'center',
         marginBottom: 20,
     },

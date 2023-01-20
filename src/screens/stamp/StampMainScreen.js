@@ -2,102 +2,23 @@ import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Confetti from 'react-native-confetti';
 import { useDispatch, useSelector } from 'react-redux';
-import RegionComponent from '../../components/stamp/RegionComponent';
-import { getStamps, selectStampCount } from '../../slices/stampSlice';
+import regions from '../../regions.json';
+import { getStamps, selectFlagCount } from '../../slices/stampSlice';
+import Region from './components/Region';
 
 function StampMainScreen() {
     const dispatch = useDispatch();
     const stamps = useSelector((state) => state.stamp.stamps);
-    const flagCount = useSelector((state) => selectStampCount(state.stamp));
-
-    const fetchData = () => {
-        dispatch(getStamps())
-            .unwrap()
-            .then((response) => {})
-            .catch((error) => {});
-    };
+    const flagCount = useSelector((state) => selectFlagCount(state.stamp));
     let confettiRef;
-    const regionList = [
-        {
-            regionType: 'SG',
-            regionName: '서울/경기',
-            top: 26.55,
-            left: 59.02,
-            pressableTop: 52,
-            pressableLeft: 33,
-        },
-        {
-            regionType: 'GW',
-            regionName: '강원도',
-            top: 0,
-            left: 124,
-            pressableTop: 60,
-            pressableLeft: 60,
-        },
-        {
-            regionType: 'CN',
-            regionName: '충청남도',
-            top: 136,
-            left: 42.07,
-            pressableTop: 40,
-            pressableLeft: 30,
-        },
-        {
-            regionType: 'CB',
-            regionName: '충청북도',
-            top: 124,
-            left: 125,
-            pressableTop: 18,
-            pressableLeft: 10,
-        },
-        {
-            regionType: 'GB',
-            regionName: '경상북도',
-            top: 109,
-            left: 163,
-            pressableTop: 90,
-            pressableLeft: 40,
-        },
-        {
-            regionType: 'GN',
-            regionName: '경상남도',
-            top: 244,
-            left: 138,
-            pressableTop: 45,
-            pressableLeft: 40,
-        },
-        {
-            regionType: 'JB',
-            regionName: '전라북도',
-            top: 221,
-            left: 55,
-            pressableTop: 20,
-            pressableLeft: 30,
-        },
-        {
-            regionType: 'JN',
-            regionName: '전라남도',
-            top: 277,
-            left: 20,
-            pressableTop: 30,
-            pressableLeft: 50,
-        },
-        {
-            regionType: 'JJ',
-            regionName: '제주도',
-            top: 410,
-            left: 53,
-            pressableTop: 0,
-            pressableLeft: 10,
-        },
-    ];
-
-    useEffect(() => {
-        fetchData();
-    }, []);
 
     useEffect(() => {
         console.log('[StampMainScreen] useEffect');
+        dispatch(getStamps());
+    }, []);
+
+    useEffect(() => {
+        console.log('[StampMainScreen] useEffect flagCount updated');
         if (flagCount == 100) {
             confettiRef.startConfetti();
         }
@@ -131,7 +52,7 @@ function StampMainScreen() {
             </View>
 
             <View style={styles.mapContainer}>
-                {regionList.map((region) => (
+                {regions.data.map((region) => (
                     <View
                         key={region.regionType}
                         style={{
@@ -140,12 +61,12 @@ function StampMainScreen() {
                             left: region.left,
                         }}
                     >
-                        <RegionComponent
+                        <Region
                             regionType={region.regionType}
                             regionName={region.regionName}
-                            pressable={true}
                             pressableTop={region.pressableTop}
                             pressableLeft={region.pressableLeft}
+                            pressable={true}
                         />
                     </View>
                 ))}
