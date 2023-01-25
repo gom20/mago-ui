@@ -63,13 +63,10 @@ const PasswordChangeScreen = () => {
             })
         )
             .unwrap()
-            .then(async (response) => {
-                await showModal({
-                    message:
-                        '비밀번호를 변경하였습니다.\n다시 로그인하여 주시기 바랍니다.',
-                    async: true,
+            .then((response) => {
+                showModal({
+                    message: '비밀번호를 변경하였습니다.',
                 });
-                navigation.navigate('Login');
             })
             .catch((error) => {});
     };
@@ -89,7 +86,7 @@ const PasswordChangeScreen = () => {
                 </View>
                 <View style={styles.inputContainer}>
                     <CustomInput
-                        label="비밀번호"
+                        label="기존 비밀번호"
                         value={password}
                         setValue={setPassword}
                         placeholder="현재 사용중인 비밀번호"
@@ -99,7 +96,7 @@ const PasswordChangeScreen = () => {
                         invalidText="현재 사용중인 비밀번호를 입력해주세요."
                     />
                     <CustomInput
-                        label="비밀번호"
+                        label="신규 비밀번호"
                         value={newPassword}
                         setValue={setNewPassword}
                         placeholder="영문자, 숫자 조합 8~20자"
@@ -109,7 +106,7 @@ const PasswordChangeScreen = () => {
                         maxLength={20}
                     />
                     <CustomInput
-                        label="비밀번호 확인"
+                        label="신규 비밀번호 확인"
                         value={newPasswordConfirm}
                         setValue={setNewPasswordConfirm}
                         placeholder="비밀번호 확인"

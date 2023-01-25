@@ -56,7 +56,7 @@ const WithdrawScreen = () => {
                     }}
                 >
                     <Entypo name="warning" size={20} color="black" />
-                    <Text style={{ marginLeft: 10 }}>
+                    <Text style={{ marginHorizontal: 5 }}>
                         탈퇴하시면 등록된 모든 데이터는 즉시 삭제되어 복구가
                         불가능합니다.
                     </Text>
@@ -67,8 +67,13 @@ const WithdrawScreen = () => {
                         onValueChange={setChecked}
                         color={isChecked ? '#000' : undefined}
                     />
-                    <Text style={{ marginLeft: 10, marginBottom: 20 }}>
-                        안내 사항을 모두 확인하였으며, 이에 동의합니다.
+                    <Text
+                        style={{
+                            marginHorizontal: 5,
+                            marginBottom: 20,
+                        }}
+                    >
+                        안내 사항을 확인하였으며, 이에 동의합니다.
                     </Text>
                 </View>
             </View>
