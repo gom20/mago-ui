@@ -34,6 +34,11 @@ const initialState = {
 const stampSlice = createSlice({
     name: 'stamp',
     initialState,
+    reducers: {
+        resetStamp: (state) => {
+            Object.assign(state, initialState);
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(getStamps.fulfilled, (state, action) => {
@@ -63,4 +68,5 @@ export const selectFlagCountByRegion = (state, regionType) => {
     ).length;
 };
 
+export const { resetStamp } = stampSlice.actions;
 export default stampSlice.reducer;

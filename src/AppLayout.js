@@ -2,13 +2,16 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import React, { useContext, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import LoadingIndicator from './components/LoadingIndicator';
 import getEnvVars from './environment';
 import AppStack from './navigations/AppStack';
 import api from './services/api';
 import { refresh, resetAuth } from './slices/authSlice';
+import { resetHiking } from './slices/hikingSlice';
 import { hideLoading, showLoading } from './slices/loadingSlice';
+import { resetRecord } from './slices/recordSlice';
+import { resetStamp } from './slices/stampSlice';
 import { store } from './store';
 import { ModalContext } from './utils/ModalContext';
 
@@ -79,6 +82,9 @@ export default function AppLayout() {
                             message:
                                 '로그인 기간이 만료되었습니다. \n 재 로그인 해주세요.',
                         });
+                        dispatch(resetRecord());
+                        dispatch(resetHiking());
+                        dispatch(resetStamp());
                         navigation.reset({ routes: [{ name: 'Onboard' }] });
                     }
                 } else {

@@ -6,6 +6,9 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../slices/authSlice';
+import { resetHiking } from '../../slices/hikingSlice';
+import { resetRecord } from '../../slices/recordSlice';
+import { resetStamp } from '../../slices/stampSlice';
 import { ModalContext } from '../../utils/ModalContext';
 
 const AccountScreen = () => {
@@ -25,6 +28,9 @@ const AccountScreen = () => {
             dispatch(logout())
                 .unwrap()
                 .then(async (response) => {
+                    dispatch(resetRecord());
+                    dispatch(resetHiking());
+                    dispatch(resetStamp());
                     navigation.reset({ routes: [{ name: 'Onboard' }] });
                 })
                 .catch((error) => {});
