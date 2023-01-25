@@ -25,10 +25,6 @@ const AccountScreen = () => {
             dispatch(logout())
                 .unwrap()
                 .then(async (response) => {
-                    await showModal({
-                        message: '로그아웃이 완료되었습니다.',
-                        async: true,
-                    });
                     navigation.reset({ routes: [{ name: 'Onboard' }] });
                 })
                 .catch((error) => {});

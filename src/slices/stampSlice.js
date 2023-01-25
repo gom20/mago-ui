@@ -8,7 +8,7 @@ export const getStamps = createAsyncThunk(
             const response = await stampAPI.getStamps(request);
             return response;
         } catch (error) {
-            console.error(error);
+            console.log(error);
             return thunkAPI.rejectWithValue();
         }
     }
@@ -21,7 +21,7 @@ export const updateStamp = createAsyncThunk(
             const response = await stampAPI.updateStamp(request);
             return response;
         } catch (error) {
-            console.error(error);
+            console.log(error);
             return thunkAPI.rejectWithValue();
         }
     }

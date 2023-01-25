@@ -11,7 +11,7 @@ export const createRecord = createAsyncThunk(
             response.data.groupId = response.data.dateTime.groupId;
             return response;
         } catch (error) {
-            console.error(error);
+            console.log(error);
             return thunkAPI.rejectWithValue();
         }
     }
@@ -29,7 +29,7 @@ export const getRecords = createAsyncThunk(
             });
             return response;
         } catch (error) {
-            console.error(error);
+            console.log(error);
             return thunkAPI.rejectWithValue();
         }
     }
@@ -45,7 +45,7 @@ export const deleteRecords = createAsyncThunk(
             });
             return response;
         } catch (error) {
-            console.error(error);
+            console.log(error);
             return thunkAPI.rejectWithValue();
         }
     }
@@ -103,7 +103,7 @@ const recordSlice = createSlice({
                     state.recordGroups = [
                         {
                             groupId: data.groupId,
-                            groupData: data,
+                            groupData: [data],
                         },
                     ];
                 }

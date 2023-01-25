@@ -1,18 +1,21 @@
-import { NavigationContainer } from '@react-navigation/native';
-import React, { useContext, useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import React, { useContext, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import LoadingIndicator from './components/LoadingIndicator';
+import getEnvVars from './environment';
 import AppStack from './navigations/AppStack';
 import api from './services/api';
+import { refresh, resetAuth } from './slices/authSlice';
 import { hideLoading, showLoading } from './slices/loadingSlice';
 import { store } from './store';
 import { ModalContext } from './utils/ModalContext';
 
 export default function AppLayout() {
-    // const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
     const { showModal } = useContext(ModalContext);
+    const navigation = useNavigation();
 
     useEffect(() => {
         api.interceptors.request.use(
@@ -37,30 +40,47 @@ export default function AppLayout() {
                 return response.data;
             },
             async function (error) {
-                const {
-                    config,
-                    response: { status },
-                } = error;
-                if (status === 401) {
-                    // TODO: Refresh Token 발급 요청
-                    // const originalRequest = config;
-                    // const accessToken = store.getState().auth.accessToken;
-                    // const refreshToken = store.getState().auth.refreshToken;
-                    // // token refresh 요청
-                    // try {
-                    //     const { response } = await authAPI.refreshToken({
-                    //         accessToken: accessToken,
-                    //         refreshToken: refreshToken,
-                    //     });
-                    //     store.getState().auth.accessToken =
-                    //         response.data.accessToken;
-                    //     store.getState().auth.refreshToken =
-                    //         response.data.refreshToken;
-                    // } catch {
-                    //     store.getState().auth.accessToken = null;
-                    //     store.getState().auth.refreshToken = null;
-                    // }
-                    // return axios(originalRequest);
+                if (
+                    error.response &&
+                    error.response.status &&
+                    error.response.status === 403
+                ) {
+                    try {
+                        const originalConfig = error.config;
+                        const resp = await axios.post(
+                            getEnvVars().apiDomain + '/api/auth/refresh',
+                            JSON.stringify({
+                                accessToken: store.getState().auth.accessToken,
+                                refreshToken:
+                                    store.getState().auth.refreshToken,
+                            }),
+                            {
+                                headers: {
+                                    'Content-Type':
+                                        'application/json; charset=utf-8',
+                                },
+                            }
+                        );
+                        if (resp) {
+                            console.log('[AppLayout] refresh API completed');
+                            dispatch(
+                                refresh({
+                                    accessToken: resp.data.data.accessToken,
+                                    refreshToken: resp.data.data.refreshToken,
+                                })
+                            );
+                            return await api.request(originalConfig);
+                        }
+                    } catch (error) {
+                        dispatch(hideLoading());
+                        dispatch(resetAuth());
+                        await showModal({
+                            async: true,
+                            message:
+                                '로그인 기간이 만료되었습니다. \n 재 로그인 해주세요.',
+                        });
+                        navigation.reset({ routes: [{ name: 'Onboard' }] });
+                    }
                 } else {
                     dispatch(hideLoading());
                     const errorMsg =
@@ -74,13 +94,11 @@ export default function AppLayout() {
                 return Promise.reject(error.resposne || error);
             }
         );
-    }, []);
+    }, [navigation]);
 
     return (
         <>
-            <NavigationContainer>
-                <AppStack />
-            </NavigationContainer>
+            <AppStack />
             <LoadingIndicator />
         </>
     );

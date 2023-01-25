@@ -1,4 +1,5 @@
 import {
+    Entypo,
     FontAwesome5,
     MaterialCommunityIcons,
     MaterialIcons,
@@ -25,6 +26,8 @@ import {
     setCurPosition,
     setStartPosition,
     startBreak,
+    decrementDelta,
+    incrementDelta,
 } from '../../slices/hikingSlice';
 import { hideLoading, showLoading } from '../../slices/loadingSlice';
 import { createRecord } from '../../slices/recordSlice';
@@ -59,6 +62,7 @@ export default HikingScreen = ({ route }) => {
     const curPosition = useSelector((state) => state.hiking.curPosition);
     const startPosition = useSelector((state) => state.hiking.startPosition);
     const breakTime = useSelector((state) => state.hiking.breakInfo.totalTime);
+    const deltaInfo = useSelector((state) => state.hiking.deltaInfo);
     const user = useSelector((state) => state.auth.user);
 
     const [isGpsFixed, setGpsFixed] = useState(true);
@@ -66,9 +70,32 @@ export default HikingScreen = ({ route }) => {
     const [toggleProps, setToggleProps] = useState(pauseBtnProps);
     const [startDatetime, setStartDatetime] = useState(null);
     const [permissionGranted, setPermissionGranted] = useState(false);
+
     const BACKGROUND_LOCATION_TASK = 'BACKGROUND-LOCATION-TASK';
     let curMarkerRef = useRef();
     let mapViewRef = useRef();
+
+    const onZoomOutPressed = () => {
+        if (deltaInfo.upLimit) return;
+        mapViewRef.animateToRegion({
+            latitude: curPosition.latitude,
+            longitude: curPosition.longitude,
+            latitudeDelta: curPosition.latitudeDelta * 5,
+            longitudeDelta: curPosition.longitudeDelta * 5,
+        });
+        dispatch(incrementDelta());
+    };
+
+    const onZoomInPressed = () => {
+        if (deltaInfo.downLimit) return;
+        mapViewRef.animateToRegion({
+            latitude: curPosition.latitude,
+            longitude: curPosition.longitude,
+            latitudeDelta: curPosition.latitudeDelta / 5,
+            longitudeDelta: curPosition.longitudeDelta / 5,
+        });
+        dispatch(decrementDelta());
+    };
 
     const onTogglePressed = () => {
         if (isHiking) {
@@ -124,8 +151,6 @@ export default HikingScreen = ({ route }) => {
             return date.toISOString().substring(0, 20);
         };
 
-        console.log(breakTime);
-
         dispatch(
             createRecord({
                 email: user.email,
@@ -141,7 +166,6 @@ export default HikingScreen = ({ route }) => {
         )
             .unwrap()
             .then((response) => {
-                console.log(response);
                 navigation.navigate('나의 산 기록', {
                     screen: 'RecordDetail',
                     params: {
@@ -230,20 +254,20 @@ export default HikingScreen = ({ route }) => {
             BACKGROUND_LOCATION_TASK
         );
         if (!isTaskDefined) {
-            console.log('Task is not defined');
+            console.log('[HikingScreen] Task is not defined');
             return;
         }
         const hasStarted = await Location.hasStartedLocationUpdatesAsync(
             BACKGROUND_LOCATION_TASK
         );
         if (hasStarted) {
-            console.log('Already started. stop then start');
+            console.log('[HikingScreen] Already started. stop then start');
             await Location.stopLocationUpdatesAsync(BACKGROUND_LOCATION_TASK);
-            console.log('Location tacking stopped');
+            console.log('[HikingScreen] Location tacking stopped');
         }
 
         await Location.startLocationUpdatesAsync(BACKGROUND_LOCATION_TASK, {
-            accuracy: Location.Accuracy.BestForNavigation,
+            accuracy: Location.Accuracy.High,
             showsBackgroundLocationIndicator: true,
             foregroundService: {
                 notificationTitle: 'Location',
@@ -259,7 +283,7 @@ export default HikingScreen = ({ route }) => {
         );
         if (hasStarted) {
             await Location.stopLocationUpdatesAsync(BACKGROUND_LOCATION_TASK);
-            console.log('Location tacking stopped');
+            console.log('[HikingScreen] Location tacking stopped');
         }
     };
 
@@ -275,38 +299,41 @@ export default HikingScreen = ({ route }) => {
                 const location = locations[0];
                 if (location) {
                     setUpdatedPosition(location);
-                    console.log('Location in background', location.coords);
+                    console.log(
+                        '[HikingScreen] Location in background',
+                        location.coords
+                    );
                 }
             }
         }
     );
 
-    const loadCurrentPosition = (mapViewRef) => {
-        console.log('현재 위치 요청');
-        Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.BestForNavigation,
-        })
-            .then((response) => {
-                console.log('현재 위치 로드 완료');
-                dispatch(hideLoading());
-                setCurrentPosition(response);
-                mapViewRef.animateToRegion({
-                    latitude: response.coords.latitude,
-                    longitude: response.coords.longitude,
-                    latitudeDelta: curPosition.latitudeDelta,
-                    longitudeDelta: curPosition.longitudeDelta,
-                });
-                initHiking();
-            })
-            .catch(async (error) => {
-                console.error(error);
-                dispatch(hideLoading());
-                await showModal({
-                    async: true,
-                    message: '위치정보를 가져올 수 없습니다.',
-                });
-                navigation.navigate('MainTab');
+    const loadCurrentPosition = async (mapViewRef) => {
+        console.log('[HikingScreen] 현재 위치 요청');
+        try {
+            const response = await Location.getCurrentPositionAsync({
+                accuracy: Location.Accuracy.Balanced,
             });
+
+            console.log('[HikingScreen] 현재 위치 로드 완료');
+            dispatch(hideLoading());
+            setCurrentPosition(response);
+            mapViewRef.animateToRegion({
+                latitude: response.coords.latitude,
+                longitude: response.coords.longitude,
+                latitudeDelta: curPosition.latitudeDelta,
+                longitudeDelta: curPosition.longitudeDelta,
+            });
+            initHiking();
+        } catch (error) {
+            console.log(error);
+            dispatch(hideLoading());
+            await showModal({
+                async: true,
+                message: '위치 정보를 가져올 수 없습니다.',
+            });
+            navigation.navigate('MainTab');
+        }
     };
 
     const confirmBackAction = async () => {
@@ -361,34 +388,35 @@ export default HikingScreen = ({ route }) => {
             }
             return false;
         };
-        console.log('위치 권한 요청');
+        console.log('[HikingScreen] 위치 권한 요청');
         requestPermissions()
             .then(async (granted) => {
                 if (granted) {
-                    console.log('위치 권한 요청 허용 완료');
+                    console.log('[HikingScreen] 위치 권한 요청 허용 완료');
                     setPermissionGranted(true);
                     dispatch(showLoading());
                 } else {
-                    console.log('위치 권한 요청 거부');
+                    console.log('[HikingScreen] 위치 권한 요청 거부');
                     await showModal({
                         message:
-                            '위치 엑세스 권한을 허용하셔야 해당 기능을 사용할 수 있습니다',
+                            '[HikingScreen] 위치 엑세스 권한을 허용하셔야 해당 기능을 사용할 수 있습니다',
                         async: true,
                     });
                     navigation.navigate('MainTab');
                 }
             })
             .catch(async (error) => {
-                console.log('위치 권한 요청 에러');
+                console.log('[HikingScreen] 위치 권한 요청 에러');
                 await showModal({
-                    message: '위치 엑세스 권한 정보를 받지 못하였습니다.',
+                    message:
+                        '[HikingScreen] 위치 엑세스 권한 정보를 받지 못하였습니다.',
                     async: true,
                 });
                 navigation.navigate('MainTab');
             });
 
         return () => {
-            console.log('Component Unmount');
+            console.log('[HikingScreen] Component Unmount');
             setPermissionGranted(false);
             dispatch(hideLoading());
             dispatch(resetHiking());
@@ -413,7 +441,7 @@ export default HikingScreen = ({ route }) => {
                         }
                     }}
                     onMapLoaded={() => {
-                        console.log('맵뷰 로드 완료');
+                        console.log('[HikingScreen] 맵뷰 로드 완료');
                         loadCurrentPosition(mapViewRef);
                     }}
                 >
@@ -453,6 +481,21 @@ export default HikingScreen = ({ route }) => {
                     />
                 </MapView>
             )}
+            <View style={styles.zoomButton}>
+                <Entypo
+                    name="plus"
+                    size={24}
+                    color={deltaInfo.downLimit ? '#EEEEEE' : '#000'}
+                    onPress={onZoomInPressed}
+                />
+                <Entypo
+                    name="minus"
+                    size={24}
+                    color={deltaInfo.upLimit ? '#EEEEEE' : '#000'}
+                    onPress={onZoomOutPressed}
+                />
+            </View>
+
             <View style={styles.gpsButton}>
                 <MaterialIcons
                     name={isGpsFixed ? 'gps-fixed' : 'gps-not-fixed'}
@@ -461,7 +504,6 @@ export default HikingScreen = ({ route }) => {
                     onPress={onGpsButtonPressed}
                 />
             </View>
-
             <View style={styles.contentContainer}>
                 <View style={styles.timerContainer}>
                     <Text style={styles.timeText}>
@@ -479,7 +521,7 @@ export default HikingScreen = ({ route }) => {
                             <Text style={styles.labelText}>거리</Text>
                         </View>
                         <Text style={styles.value}>
-                            {curPosition.distance.toFixed(3)} m
+                            {curPosition.distance.toFixed(3)} km
                         </Text>
                     </View>
 
@@ -532,6 +574,19 @@ const styles = StyleSheet.create({
     mapContainer: {
         width: '100%',
         height: '73%',
+    },
+    zoomButton: {
+        position: 'absolute',
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        top: '45%',
+        right: '5%',
+        width: 45,
+        height: 90,
+        elevation: 4,
+        borderRadius: 5,
+        backgroundColor: '#ffffff',
     },
     gpsButton: {
         position: 'absolute',

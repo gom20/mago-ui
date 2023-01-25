@@ -1,3 +1,4 @@
+import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useCallback } from 'react';
@@ -30,7 +31,9 @@ export default function App() {
             <Provider store={store}>
                 <PersistGate loading={null} persistor={persistor}>
                     <ModalProvider>
-                        <AppLayout />
+                        <NavigationContainer>
+                            <AppLayout />
+                        </NavigationContainer>
                     </ModalProvider>
                 </PersistGate>
             </Provider>

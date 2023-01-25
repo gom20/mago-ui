@@ -2,7 +2,9 @@ import { createSlice } from '@reduxjs/toolkit';
 import haversine from 'haversine';
 
 const LAT = 37.574187,
-    LNG = 126.976882;
+    LNG = 126.976882,
+    DELTA_DOWN_LIMIT = 0.0004,
+    DELTA_UP_LIMIT = 6.25;
 
 const initialState = {
     curPosition: {
@@ -25,6 +27,10 @@ const initialState = {
         totalTime: 0,
         startTime: 0,
         endTime: 0,
+    },
+    deltaInfo: {
+        downLimit: false,
+        upLimit: false,
     },
 };
 
@@ -78,6 +84,30 @@ const hikingSlice = createSlice({
                 state.breakInfo.totalTime +
                 (action.payload - state.breakInfo.startTime);
         },
+        incrementDelta: (state) => {
+            if (!state.deltaInfo.upLimit) {
+                state.deltaInfo.downLimit = false;
+                state.curPosition.latitudeDelta =
+                    state.curPosition.latitudeDelta * 5;
+                state.curPosition.longitudeDelta =
+                    state.curPosition.longitudeDelta * 5;
+                if (state.curPosition.latitudeDelta * 5 > DELTA_UP_LIMIT) {
+                    state.deltaInfo.upLimit = true;
+                }
+            }
+        },
+        decrementDelta: (state) => {
+            if (!state.deltaInfo.downLimit) {
+                state.deltaInfo.upLimit = false;
+                state.curPosition.latitudeDelta =
+                    state.curPosition.latitudeDelta / 5;
+                state.curPosition.longitudeDelta =
+                    state.curPosition.longitudeDelta / 5;
+                if (state.curPosition.latitudeDelta / 5 < DELTA_DOWN_LIMIT) {
+                    state.deltaInfo.downLimit = true;
+                }
+            }
+        },
     },
 });
 
@@ -89,5 +119,7 @@ export const {
     startBreak,
     endBreak,
     resetBreak,
+    incrementDelta,
+    decrementDelta,
 } = hikingSlice.actions;
 export default hikingSlice.reducer;

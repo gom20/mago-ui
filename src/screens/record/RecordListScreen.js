@@ -36,7 +36,7 @@ function RecordListScreen() {
     const { showModal } = useContext(ModalContext);
 
     const onItemPressed = (row) => {
-        console.log('onItemPressed');
+        console.log('[RecordListScreen] onItemPressed');
         if (!deleteMode) {
             navigation.navigate('RecordDetail', { recordId: row.uid });
         } else {
@@ -52,7 +52,7 @@ function RecordListScreen() {
     };
 
     const onItemLongPressed = (row) => {
-        console.log('longPressed');
+        console.log('[RecordListScreen] longPressed');
         if (!deleteMode) {
             dispatch(enableDelete());
             dispatch(selectRecordToDel(row.uid));
@@ -74,22 +74,25 @@ function RecordListScreen() {
                 dispatch(disableDelete());
             })
             .catch((error) => {
-                console.error(error);
+                console.log(error);
             });
     };
 
-    const currentPage = useSelector((state) => state.record.pageNumber);
+    const lastPage = useSelector((state) => state.record.page);
     const last = useSelector((state) => state.record.last);
     const onEndReached = () => {
         if (last) return;
-        fetchData({ page: currentPage + 1 });
+        console.log('[RecordListScreen] onEndReached');
+        fetchData({ page: lastPage + 1 });
     };
 
     const onRefresh = () => {
+        console.log('[RecordListScreen] onRefresh');
         fetchData({ page: 0 });
     };
 
     const fetchData = (request) => {
+        console.log('[RecordListScreen] fetchData');
         if (deleteMode) return;
         setIsRefreshing(true);
         dispatch(getRecords(request))
@@ -181,9 +184,10 @@ function RecordListScreen() {
     );
 
     useEffect(() => {
+        console.log('[RecordListScreen] useEffect');
         fetchData({ page: 0 });
         return () => {
-            console.log('recordList unmount');
+            console.log('[RecordListScreen] recordList unmount');
         };
     }, []);
 
@@ -200,12 +204,12 @@ function RecordListScreen() {
                                 backgroundColor:
                                     deleteMode &&
                                     recordsToDelete.includes(row.uid)
-                                        ? '#FFC0CB'
+                                        ? '#EEEEEE'
                                         : '#fff',
                             },
                         ]}
                         activeOpacity={0.8}
-                        underlayColor="#DBDBDB"
+                        underlayColor="#EEEEEE"
                         onPress={() => onItemPressed(row)}
                         onLongPress={() => onItemLongPressed(row)}
                     >
@@ -250,6 +254,7 @@ function RecordListScreen() {
                                     color="black"
                                 />
                                 <Text style={styles.text}>
+                                    {' '}
                                     {row.dateTime.totalTime
                                         .split(' ')
                                         .slice(0, 2)
