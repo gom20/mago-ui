@@ -63,10 +63,12 @@ const PasswordChangeScreen = () => {
             })
         )
             .unwrap()
-            .then((response) => {
-                showModal({
+            .then(async (response) => {
+                await showModal({
+                    async: true,
                     message: '비밀번호를 변경하였습니다.',
                 });
+                navigation.navigate('Account');
             })
             .catch((error) => {});
     };
