@@ -267,7 +267,7 @@ export default HikingScreen = ({ route }) => {
         }
 
         await Location.startLocationUpdatesAsync(BACKGROUND_LOCATION_TASK, {
-            accuracy: Location.Accuracy.High,
+            accuracy: Location.Accuracy.BestForNavigation,
             showsBackgroundLocationIndicator: true,
             foregroundService: {
                 notificationTitle: 'Location',
@@ -299,10 +299,10 @@ export default HikingScreen = ({ route }) => {
                 const location = locations[0];
                 if (location) {
                     setUpdatedPosition(location);
-                    console.log(
-                        '[HikingScreen] Location in background',
-                        location.coords
-                    );
+                    // console.log(
+                    //     '[HikingScreen] Location in background',
+                    //     location.coords
+                    // );
                 }
             }
         }
