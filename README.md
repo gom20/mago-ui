@@ -51,5 +51,5 @@
 <br>
 
 * ### 이메일
-<kbd>![email1](https://user-images.githubusercontent.com/7158623/215309214-4d53db75-4fbf-4449-bafd-bcd5bf8910db.PNG)</kbd>&nbsp;&nbsp;&nbsp;&nbsp;
+<kbd>![email1](https://user-images.githubusercontent.com/7158623/215309214-4d53db75-4fbf-4449-bafd-bcd5bf8910db.PNG)</kbd>&nbsp;
 <kbd>![email2](https://user-images.githubusercontent.com/7158623/215309144-083897ed-78fa-47c7-94f4-fe9ee39ce166.PNG)</kbd>
