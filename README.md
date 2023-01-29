@@ -1,4 +1,4 @@
-# 🏔 MountainGo
+# 🏔 Mountain Go
 <img src="https://img.shields.io/badge/Expo-000020?style=flat&logo=Expo&logoColor=white"/> <img src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=React&logoColor=black"/> <img src="https://img.shields.io/badge/Redux-764ABC?style=flat&logo=Redux&logoColor=white"/>
 
 
@@ -22,7 +22,7 @@
 
 <br>
 
-* ### 등산하기
+* ### 등산 하기
 <kbd>![hiking1](https://user-images.githubusercontent.com/7158623/215308114-1d23f611-1fbb-44af-955e-09587f8eaab1.jpg)</kbd>&nbsp;&nbsp;&nbsp;&nbsp;
 <kbd>![hiking2](https://user-images.githubusercontent.com/7158623/215308119-7756218e-b915-4844-8207-889d47ed1206.jpg)</kbd>&nbsp;&nbsp;&nbsp;&nbsp;
 <kbd>![hiking3](https://user-images.githubusercontent.com/7158623/215308124-f2f057f2-0bcf-4590-a4c1-ca89b0585ab1.jpg)</kbd>
@@ -36,7 +36,7 @@
 
 <br>
 
-* ### 100대 명산 깃발 꽂기
+* ### 도전 100대 명산
 <kbd>![stamp1](https://user-images.githubusercontent.com/7158623/215308146-e185dbba-c0c4-490d-ad38-d4bc43207df6.jpg)</kbd>&nbsp;&nbsp;&nbsp;&nbsp;
 <kbd>![stamp2](https://user-images.githubusercontent.com/7158623/215308151-3b5b8d0e-225b-4083-8266-d07818ea1914.jpg)</kbd>&nbsp;&nbsp;&nbsp;&nbsp;
 <kbd>![stamp4](https://user-images.githubusercontent.com/7158623/215308163-976dc1ce-0652-496a-9e3d-13145ddb3bd0.jpg)</kbd>
@@ -50,6 +50,6 @@
 
 <br>
 
-* ### 이메일 템플릿
+* ### 이메일
 <kbd>![email1](https://user-images.githubusercontent.com/7158623/215309214-4d53db75-4fbf-4449-bafd-bcd5bf8910db.PNG)</kbd>&nbsp;&nbsp;&nbsp;&nbsp;
 <kbd>![email2](https://user-images.githubusercontent.com/7158623/215309144-083897ed-78fa-47c7-94f4-fe9ee39ce166.PNG)</kbd>
